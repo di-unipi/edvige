@@ -1,0 +1,27 @@
+<mjml>
+  <mj-head>
+      <mj-font name="IBM Plex Sans" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans" />
+      <mj-style inline="inline">
+            body {
+                font-family: 'IBM Plex Sans', sans-serif;
+                font-size: 17px;
+                line-height: 1.8;
+            }
+            header {
+                font-size: 20px;
+            }
+      </mj-style>
+  </mj-head>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text css-class="header">
+          edvige 🦉
+        </mj-text>
+        <mj-text>
+            %%%BODY%%%
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
