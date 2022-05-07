@@ -1,23 +1,28 @@
 <mjml>
   <mj-head>
       <mj-font name="IBM Plex Sans" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans" />
-      <mj-style inline="inline">
-            body {
-                font-family: 'IBM Plex Sans', sans-serif;
-                font-size: 17px;
-                line-height: 1.8;
-            }
-            header {
-                font-size: 20px;
-            }
-      </mj-style>
+      <mj-attributes>
+        <mj-class name="big" font-size="20px" />
+        <mj-all font-family="IBM Plex Sans, sans-serif"
+                font-size="15px"
+                line-height="1.8">
+      </mj-attributes>
   </mj-head>
   <mj-body>
-    <mj-section>
+    <mj-section padding-bottom="0px">
       <mj-column>
-        <mj-text css-class="header">
-          edvige 🦉
+        <mj-text mj-class="big">
+        🦉 Edvige #%%%IDX%%%
         </mj-text>
+      </mj-column>
+      <mj-column>
+        <mj-text mj-class="big" align="right">
+        %%%DATE%%%
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section padding-top="0px">
+      <mj-column>
         <mj-text>
             %%%BODY%%%
         </mj-text>
