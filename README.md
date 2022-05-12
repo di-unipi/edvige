@@ -6,4 +6,4 @@ After creating the body of an email in the `archive` folder as `month_year.md`, 
 make
 ```
 
-Yes, it's that easy 😄.
+yep, that easy.
