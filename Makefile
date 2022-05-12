@@ -1,6 +1,6 @@
 all: src/ archive/
-	mkdir -p build
+	mkdir -p docs
 	bash src/render_all.sh
 
 clean:
-	rm -rf build
+	rm -rf docs

@@ -4,7 +4,7 @@ from datetime import datetime as dt
 
 if __name__ == '__main__':
     # Get list of mail files sorted by date
-    mails = os.listdir('build')
+    mails = os.listdir('docs')
     # Remove index.html if present
     mails = [mail for mail in mails if mail != 'index.html']
     mails = sorted(
@@ -31,5 +31,5 @@ if __name__ == '__main__':
     template = template.replace('{{mail_list}}', mail_list)
 
     # Write the file
-    with open('build/index.html', 'w') as f:
+    with open('docs/index.html', 'w') as f:
         f.write(template)
