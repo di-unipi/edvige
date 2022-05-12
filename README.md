@@ -1,5 +1,9 @@
 # Edvige 🦉
 
+After creating the body of an email in the `archive` folder as `month_year.md`, just:
+
 ```bash
-./render.sh archive/may_2022.md
+make
 ```
+
+Yes, it's that easy 😄.
