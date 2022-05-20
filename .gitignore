@@ -1,0 +1,10 @@
+credentials.json
+events.csv
+index.html
+venv/
+.idea/
+*.DS_Store*
+log
+src/footer.pug
+src/next.pug
+src/upcoming.pug
