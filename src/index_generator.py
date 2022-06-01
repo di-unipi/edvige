@@ -10,7 +10,7 @@ if __name__ == '__main__':
     mails = sorted(
         mails,
         key=lambda x: dt.strptime(x, '%B_%Y.html'),
-        reverse=True
+        reverse=False
     )
 
     # Open template

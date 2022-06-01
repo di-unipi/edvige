@@ -22,7 +22,7 @@ if __name__ == '__main__':
     mails = sorted(
         mails,
         key=lambda x: dt.strptime(x, '%B_%Y.md'),
-        reverse=True
+        reverse=False
     )
 
     if len(sys.argv) > 1:
@@ -33,7 +33,7 @@ if __name__ == '__main__':
         # archive folder. Mails are
         # stored in the format
         # "monthname_year.md"
-        mail_path = f'archive/{mails[0]}'
+        mail_path = f'archive/{mails[-1]}'
 
     # Retrieve the date from the filename
     date = dt.strptime(mail_path.split('/')[-1].split('.')[0], '%B_%Y')
