@@ -1,6 +1,3 @@
 all: src/ archive/
-	mkdir -p docs
+	mkdir -p www/newsletter
 	bash src/render_all.sh
-
-clean:
-	rm -rf docs

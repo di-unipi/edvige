@@ -4,9 +4,9 @@ from datetime import datetime as dt
 
 if __name__ == '__main__':
     # Get list of mail files sorted by date
-    mails = os.listdir('docs')
+    mails = os.listdir('www/newsletter')
     # Remove index.html if present
-    mails = [mail for mail in mails if mail != 'index.html']
+    mails = [mail for mail in mails if mail != "index.html"]
     mails = sorted(
         mails,
         key=lambda x: dt.strptime(x, '%B_%Y.html'),
@@ -14,7 +14,7 @@ if __name__ == '__main__':
     )
 
     # Open template
-    with open('src/index_template.html', 'r') as f:
+    with open('layout/index_template.html', 'r') as f:
         template = f.read()
 
     # Construct list elements
@@ -31,5 +31,6 @@ if __name__ == '__main__':
     template = template.replace('{{mail_list}}', mail_list)
 
     # Write the file
-    with open('docs/index.html', 'w') as f:
-        f.write(template)
+    print(template)
+    # with open('www/index.html', 'w') as f:
+    #     f.write(template)

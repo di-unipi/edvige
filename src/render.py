@@ -139,13 +139,13 @@ if __name__ == '__main__':
     upcoming, future = future[0], future[1:]
 
     # Render upcoming
-    with open('src/upcoming.pug', 'w') as f:
+    with open('layout/upcoming.pug', 'w') as f:
         f.write('.row.mt-4.mb-2\n')
         f.write('  h1 #[span.emoji 🚀] Upcoming\n')
         f.write(render_talk(upcoming, True))
 
     # Render future talks
-    with open('src/next.pug', 'w') as f:
+    with open('layout/next.pug', 'w') as f:
         if future:
             f.write('.row.mt-4.mb-4\n')
             f.write('  h1 #[span.emoji 🔮] Next Events\n')
@@ -156,7 +156,7 @@ if __name__ == '__main__':
             f.write('')
 
     # Render footer with date and hour
-    with open('src/footer.pug', 'w') as f:
+    with open('layout/footer.pug', 'w') as f:
         footer = raw_footer.replace('%%%DATE%%%', now.strftime('%d/%m/%Y'))
         footer = footer.replace('%%%HOUR%%%', now.strftime('%H:%M'))
         f.write(footer)
