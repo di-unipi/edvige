@@ -77,7 +77,12 @@ def render_talk(talk: dict, upcoming: bool = False):
 
     # Eventually add abstract
     if talk['Abstract'] and upcoming:
-        output = output.replace('%%%ABSTRACT%%%', talk['Abstract'])
+        lines = talk['Abstract'].split('\n')
+        abstract = '#[br] \n        |'.join(lines)
+        # import sys
+        # print(abstract, file=sys.stderr)
+        # sys.exit(1)
+        output = output.replace('%%%ABSTRACT%%%', abstract)
     else:
         output = output.replace('%%%ABSTRACT%%%', 'No abstract available')
 
