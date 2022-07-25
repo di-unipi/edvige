@@ -1,10 +1,10 @@
+*.DS_Store*
+.idea/
 credentials.json
 events.csv
 index.html
-venv/
-.idea/
-*.DS_Store*
+layout/footer.pug
+layout/next.pug
+layout/upcoming.pug
 log
-src/footer.pug
-src/next.pug
-src/upcoming.pug
+venv/
