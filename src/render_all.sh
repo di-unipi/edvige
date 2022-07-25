@@ -1,4 +1,4 @@
-#! bash
+#! /bin/bash
 
 # Iterate over the markdown files
 for file in archive/*.md; do

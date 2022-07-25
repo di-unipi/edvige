@@ -3,6 +3,7 @@ import os
 import sys
 from datetime import datetime as dt
 
+
 def render_mail(mail_path: str, date: str, idx: int):
     with open('layout/template.mjml', 'r') as f:
         template = f.read()
