@@ -95,7 +95,7 @@ def suffix(d: int):
     a given day of the month.
     """
     return 'th' if 11 <= d <= 13 \
-            else {1: 'st', 2: 'nd', 3: 'rd'}.get(d % 10, 'th')
+        else {1: 'st', 2: 'nd', 3: 'rd'}.get(d % 10, 'th')
 
 
 if __name__ == '__main__':
