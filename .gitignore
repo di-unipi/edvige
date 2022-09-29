@@ -5,6 +5,6 @@ venv/
 .idea/
 *.DS_Store*
 log
-src/footer.pug
-src/next.pug
-src/upcoming.pug
+layout/footer.pug
+layout/next.pug
+layout/upcoming.pug
