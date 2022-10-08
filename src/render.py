@@ -1,5 +1,5 @@
-from csv import DictReader
 from datetime import datetime as dt
+from icalendar import Calendar
 
 # Layout for the next talks
 raw = """
@@ -9,7 +9,6 @@ raw = """
     h5.month.mb-0 %%%MONTH%%%
     p %%%HOUR%%%
   .col-10
-    p.author #[span.me %%%AUTHOR%%%]
     h4.title.mb-1
       | %%%TITLE%%%
     p.address %%%LUOGO%%%"""
@@ -18,7 +17,6 @@ raw = """
 raw_upcoming = """
 .row.next
   .col-9
-    p.author #[span.me %%%AUTHOR%%%]
     h2.title.mb-0.mt-1
       | %%%TITLE%%%
     p.address %%%LUOGO%%%
@@ -72,16 +70,12 @@ def render_talk(talk: dict, upcoming: bool = False):
     output = output.replace('%%%MONTH%%%', month)
     output = output.replace('%%%HOUR%%%', talk['Ora'])
     output = output.replace('%%%LUOGO%%%', talk['Luogo'])
-    output = output.replace('%%%AUTHOR%%%', talk['Autore'])
     output = output.replace('%%%TITLE%%%', talk['Titolo'])
 
     # Eventually add abstract
     if talk['Abstract'] and upcoming:
         lines = talk['Abstract'].split('\n')
         abstract = '#[br] \n        |'.join(lines)
-        # import sys
-        # print(abstract, file=sys.stderr)
-        # sys.exit(1)
         output = output.replace('%%%ABSTRACT%%%', abstract)
     else:
         output = output.replace('%%%ABSTRACT%%%', 'No abstract available')
@@ -112,33 +106,40 @@ if __name__ == '__main__':
                         help='CSV file containing talks')
     args = parser.parse_args()
 
-    # Parse CSV file into a dictionary
-    with open(args.csv_filename, 'r') as fp:
-        csv_reader = DictReader(fp)
-        talks = list(csv_reader)
+    talks = []
+    with open(args.csv_filename, 'rb') as fp:
+        gcal = Calendar.from_ical(fp.read())
+        for component in gcal.walk():
+            if component.name == "VEVENT":
+                talks.append({
+                    'Titolo': component.get('summary'),
+                    'Inizio': component.get('dtstart').dt,
+                    'Fine': component.get('dtend').dt,
+                    'Luogo': component.get('location'),
+                    'Abstract': component.get('description')
+                })
 
-    # Get current datetime
+    # Get current date and time
     if not args.date:
-        now = dt.now()
+        now = dt.now().astimezone()
     else:
         now = dt.strptime(args.date, '%d/%m/%Y')
 
-    # Sort by time
-    talks.sort(key=lambda t: dt.strptime(t['Ora'], '%H:%M'))
-    # Sort by date
-    talks.sort(key=lambda t: dt.strptime(t['Data'], '%d/%m/%Y'))
-    # Put together date and time
+    # Extract date and time
     for t in talks:
-        date = dt.strptime(t['Data'], '%d/%m/%Y')
-        time = dt.strptime(t['Ora'], '%H:%M')
-        t['datetime'] = dt(date.year, date.month, date.day,
-                           time.hour, time.minute)
-        if t['datetime'] > now:
-            print(f'Ok {t["Titolo"]} {t["datetime"]} {now}')
+        t['Data'] = dt.strftime(t['Inizio'], '%d/%m/%Y')
+        t['Ora'] = dt.strftime(t['Inizio'], '%H:%M')
+
+    # Sort by start time
+    talks.sort(key=lambda t: t['Inizio'])
 
     # Filter talks
     talks = [talk for talk in talks if talk['Titolo']]
-    future = [talk for talk in talks if talk['datetime'] > now]
+    future = [talk for talk in talks if talk['Fine'] > now]
+
+    # Log future events
+    for t in future:
+        print(f'Ok {t["Titolo"]} {t["Inizio"]} {now}')
 
     # Assign upcoming
     upcoming, future = future[0], future[1:]

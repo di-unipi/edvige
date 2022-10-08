@@ -1,16 +1,16 @@
-import gspread
-import csv
+"""
+Download the calendar basic.ics
+"""
+
+import requests
+
+URL = 'https://calendar.google.com/calendar/ical/' \
+      'c_31hk6lrp2plgq36e1heodpbca0%40group.calendar.google.com/' \
+      'public/basic.ics'
+FNAME = 'basic.ics'
+
 
 if __name__ == '__main__':
-    gc = gspread.service_account(filename='credentials.json')
-    # Access to the google spreadSheet named "Eventi e news"
-    spreadsheet = gc.open("Eventi e news")
-
-    # Access to the sheet named "Eventi"
-    wks = spreadsheet.worksheet("Eventi")
-
-    # Writes each row of the sheet into a csv file named "events.csv"
-    filename = "events.csv"
-    with open(filename, 'w') as f:
-        writer = csv.writer(f)
-        writer.writerows(wks.get_all_values())
+    response = requests.get(URL)
+    with open(FNAME, mode='wb') as localfile:
+        localfile.write(response.content)
