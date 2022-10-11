@@ -113,8 +113,8 @@ if __name__ == '__main__':
             if component.name == "VEVENT":
                 talks.append({
                     'Titolo': component.get('summary'),
-                    'Inizio': component.get('dtstart').dt,
-                    'Fine': component.get('dtend').dt,
+                    'Inizio': component.get('dtstart').dt.astimezone(),
+                    'Fine': component.get('dtend').dt.astimezone(),
                     'Luogo': component.get('location'),
                     'Abstract': component.get('description')
                 })
