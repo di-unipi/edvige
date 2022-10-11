@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
     # Parse arguments
     parser = argparse.ArgumentParser(description='Render talks')
-    parser.add_argument('-n', '--number', type=int, default=7,
+    parser.add_argument('-n', '--number', type=int, default=5,
                         help='Number of talks to render')
     parser.add_argument('-d', '--date', type=str,
                         help='Render page for a specific date '
@@ -145,8 +145,6 @@ if __name__ == '__main__':
     # Render future talks
     with open('layout/next.pug', 'w') as f:
         if future:
-            f.write('.row.mt-4.mb-4\n')
-            f.write('  h1 #[span.emoji 🔮] Next Events\n')
             # Write the next n talks
             for talk in future[:args.number]:
                 f.write(render_talk(talk))
