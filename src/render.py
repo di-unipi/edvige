@@ -7,7 +7,7 @@ raw = """
   .col-2
     h3.mb-0 %%%DAY%%%
     h5.month.mb-0 %%%MONTH%%%
-    p %%%HOUR%%%
+    p.small %%%HOUR%%%-%%%END%%%
   .col-10
     h4.title.mb-1
       | %%%TITLE%%%
@@ -23,7 +23,7 @@ raw_upcoming = """
   .col-2
     h1.day %%%DAY%%%
     h4.month.mb-0 %%%MONTH%%%
-    p %%%HOUR%%%
+    p %%%HOUR%%%-%%%END%%%
   .col-11
       p
         | %%%ABSTRACT%%%
@@ -43,9 +43,8 @@ def render_talk(talk: dict, upcoming: bool = False):
     The talk dictionary should contain
     the following keys:
     - Titolo
-    - Autore
-    - Data (in format %d/%m/%Y)
-    - Ora
+    - Inizio
+    - Fine
     - Abstract (optional)
     """
     if upcoming:
@@ -53,14 +52,11 @@ def render_talk(talk: dict, upcoming: bool = False):
     else:
         template = raw
 
-    # Parse date
-    date = dt.strptime(talk['Data'], '%d/%m/%Y')
-
     # Get month name
-    month = date.strftime('%B')
+    month = talk['Inizio'].strftime('%B')
 
     # Get cardinal day without leading zero
-    day = str(int(date.strftime('%d')))
+    day = str(int(talk['Inizio'].strftime('%d')))
 
     # Add suffix to day
     day += suffix(int(day))
@@ -68,7 +64,8 @@ def render_talk(talk: dict, upcoming: bool = False):
     # Build the output
     output = template.replace('%%%DAY%%%', day)
     output = output.replace('%%%MONTH%%%', month)
-    output = output.replace('%%%HOUR%%%', talk['Ora'])
+    output = output.replace('%%%HOUR%%%', dt.strftime(talk['Inizio'], '%H:%M'))
+    output = output.replace('%%%END%%%', dt.strftime(talk['Fine'], '%H:%M'))
     output = output.replace('%%%LUOGO%%%', talk['Luogo'])
     output = output.replace('%%%TITLE%%%', talk['Titolo'])
 
@@ -97,7 +94,7 @@ if __name__ == '__main__':
 
     # Parse arguments
     parser = argparse.ArgumentParser(description='Render talks')
-    parser.add_argument('-n', '--number', type=int, default=4,
+    parser.add_argument('-n', '--number', type=int, default=7,
                         help='Number of talks to render')
     parser.add_argument('-d', '--date', type=str,
                         help='Render page for a specific date '
@@ -124,11 +121,6 @@ if __name__ == '__main__':
         now = dt.now().astimezone()
     else:
         now = dt.strptime(args.date, '%d/%m/%Y')
-
-    # Extract date and time
-    for t in talks:
-        t['Data'] = dt.strftime(t['Inizio'], '%d/%m/%Y')
-        t['Ora'] = dt.strftime(t['Inizio'], '%H:%M')
 
     # Sort by start time
     talks.sort(key=lambda t: t['Inizio'])
