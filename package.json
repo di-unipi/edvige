@@ -4,6 +4,7 @@
     "pug-cli": "^1.0.0-alpha6"
   },
   "scripts": {
-    "calendar": "scripts/calendar"
+    "calendar": "scripts/calendar",
+    "newsletter": "scripts/newsletter"
   }
 }
