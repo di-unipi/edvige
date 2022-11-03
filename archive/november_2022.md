@@ -2,6 +2,7 @@ Hi there! Edvige is here!
 
 ## 📰 NEWS
 
+- 📅 We have a [Google Calendar](https://calendar.google.com/calendar/u/0/render?cid=c_31hk6lrp2plgq36e1heodpbca0%40group.calendar.google.com) to get events updates!
 - 🪟 Call for study and research grants in North America - ISNAF [link](https://www.unipi.it/index.php/studiare-all-estero/item/24049-bando-isnaf)
 
 ## 📆 EVENTS
@@ -23,6 +24,5 @@ Please use the [Edvige’s form](https://forms.gle/QjRuQ12iqabMtU2F8) for commun
 See you next month! 
 
 Where is our Autumn? With nostalgia 🍁,  
-
 Edvige and the Communication Team 🦉.<br/>
 *Alessandro Berti, Antonio Boffa, Luca Corbucci, Marta Marchiori Manerba, Jacopo Massa, Riccardo Massidda coordinated by Daniele Mazzei*
