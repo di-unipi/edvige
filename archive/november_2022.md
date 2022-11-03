@@ -8,7 +8,7 @@ Hi there! Edvige is here!
 
 - **Seminars on AI and Biometrics**<br/>
   10:00, November 4rd, Sala Seminari Est
-- **The IT interview process is fundamentally broken! **, by [Nicola Corti](https://www.linkedin.com/in/cortinico/) in [Superhero Valley](https://superherovalley.fun/)<br/>
+- **The IT interview process is fundamentally broken!**, by [Nicola Corti](https://www.linkedin.com/in/cortinico/) in [Superhero Valley](https://superherovalley.fun/)<br/>
   18:00, November 7th, [online](https://teams.microsoft.com/l/meetup-join/19%3ameeting_YjMzNmRhYjMtYzk4Ny00MmI3LThhMjQtYmY3ODk4OTI4ZTc4%40thread.v2/0?context=%7b%22Tid%22%3a%22c7456b31-a220-47f5-be52-473828670aa1%22%2c%22Oid%22%3a%2245ae8565-02c2-4b3b-bf78-7b9278f7fdb8%22%7d)
 - **Research in Academia Vs. Research in Industry**, by [Fabrizio Silvestri](https://www.linkedin.com/search/results/all/?heroEntityKey=urn%3Ali%3Afsd_profile%3AACoAAAAuxbMBWbCLmGf2cGg8raSW4cVTcOFWFvc&keywords=fabrizio%20silvestri&origin=RICH_QUERY_SUGGESTION&position=0&searchId=d9de9a40-ca85-4bc8-a409-e4a46eb4d939&sid=8Ea) in [Superhero Valley](https://superherovalley.fun/)<br/>
   18:00, November 14th, [online](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NDMyMTc2M2QtNzlhYS00YzdiLThjZjEtNjgwMjFlMGRmYjY4%40thread.v2/0?context=%7b%22Tid%22%3a%22c7456b31-a220-47f5-be52-473828670aa1%22%2c%22Oid%22%3a%2245ae8565-02c2-4b3b-bf78-7b9278f7fdb8%22%7d)
