@@ -1,10 +1,26 @@
 import os
 from datetime import datetime as dt
 
+template = """
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>🦉 Edvige</title>
+  </head>
+  <body>
+    <h1>🦉 Edvige</h1>
+    <ol>
+      {{mail_list}}
+    </ol>
+  </body>
+</html>
+"""
+
 
 if __name__ == '__main__':
     # Get list of mail files sorted by date
     mails = os.listdir('www/newsletter')
+
     # Remove index.html if present
     mails = [mail for mail in mails if mail != "index.html"]
     mails = sorted(
@@ -12,10 +28,6 @@ if __name__ == '__main__':
         key=lambda x: dt.strptime(x, '%B_%Y.html'),
         reverse=False
     )
-
-    # Open template
-    with open('layout/index_template.html', 'r') as f:
-        template = f.read()
 
     # Construct list elements
     elements = []
@@ -32,5 +44,3 @@ if __name__ == '__main__':
 
     # Write the file
     print(template)
-    # with open('www/index.html', 'w') as f:
-    #     f.write(template)
