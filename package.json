@@ -5,6 +5,7 @@
   },
   "scripts": {
     "calendar": "scripts/calendar",
-    "newsletter": "scripts/newsletter"
+    "newsletter": "scripts/newsletter",
+    "install": "pip3 install -r requirements.txt"
   }
 }
