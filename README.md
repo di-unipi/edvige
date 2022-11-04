@@ -1,48 +1,64 @@
 # Edvige 🦉
 
-After creating the body of an email in the `archive` folder as `month_year.md`, just:
+Edvige is the codename
+for the communication team
+of the [Department of Computer Science](https://di.unipi.it)
+at the University of Pisa.
+In this repository,
+you will find the code
+to format our monthly newsletter
+and to serve our website,
+which we currently screencast
+near the coffee machines. ☕
+
+This amount of spaghetti
+that we love to call codebase
+depends on various tools.
+Assuming that you already installed
+`npm` for
+[NodeJS](https://nodejs.org/en/)
+and `pip3` for
+[Python](https://www.python.org/),
+you can install the required dependencies
+as follows.
 
 ```bash
-make
+npm ci
 ```
 
 yep, that easy.
 
-# 🤖 0xFEED
+## 📰 Newsletter
 
-Code for the live presentation of the next events
-from the 0xFEED communications team.
+The newsletter entries
+should be written
+in Markdown format
+and stored in the `archive` folder
+with naming `month_year.md`,
+as in `september_2022.md`.
 
-The tool works in two steps:
+Then, you should run:
 
-1. Firstly, the script `downloader.py` downloads alle the events from a Google Spreadsheet, using the module [`gspread`](https://github.com/burnash/gspread), and writes them to the `events.csv` file.
-
-    *N.B.* To properly work, the script needs to be run with a file named `credentials.json` in the same directory. To know how to create this file, please refer to the [`gspread` documentation](https://docs.gspread.org/en/latest/oauth2.html).
-
-2. Secondly, the script `render.py` reads the `events.csv` file
-and updates the templates `upcoming.pug` and `next.pug`. The
-former contains the first upcoming event, the latter all the
-following events.
-
-Consequently, the static HTML page `index.html` is generated
-via the command:
 ```bash
-pug --doctype html --pretty src/index.pug --out .
+npm run newsletter 
 ```
 
-The procedure is automated in the `run.sh` bash script, which also logs the described steps.
+The script transpiles Markdown documents
+into HTML files using [mjml](https://mjml.io/),
+so that thay can be easily and cross-platform
+shared through email.
+The resulting HTML files are in the
+`www/newsletter/` folder.
 
-## ⏱ CRONJOB
+## 📺 Website
 
-The `cronjob.txt` file contains commands to schedule some operations:
+We keep track of the Department events
+via a Google Calendar.
+The following command automatically downloads
+the calendar as an ICS file and generates
+a static website in `www` to visualize
+upcoming events.
 
 ```bash
-# Execute 'run.sh' script every hour
-0 * * * * cd /home/pi/0xfeed && ./run.sh
-
-# "Turn on" the display linked to the raspberry, at 8am on every day-of-week from Monday through Friday.
-0 8  * * 1-5 vcgencmd display_power 1
-
-# "Turn off" the display linked to the raspberry, at 7pm on every day-of-week from Monday through Friday.
-0 19 * * 1-5 vcgencmd display_power 0
+npm run calendar
 ```
