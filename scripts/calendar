@@ -1,0 +1,8 @@
+#! /bin/bash
+
+# Update Calendar Visualization
+python3 scripts/downloader.py >> log &&
+python3 scripts/render.py basic.ics >> log &&
+node_modules/.bin/pug --doctype html --pretty layout/index.pug --out . &&
+mv index.html www/index.html &&
+date >> log

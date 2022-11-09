@@ -9,3 +9,4 @@ layout/upcoming.pug
 log
 venv/
 basic.ics
+node_modules

@@ -133,23 +133,35 @@ if __name__ == '__main__':
     for t in future:
         print(f'Ok {t["Titolo"]} {t["Inizio"]} {now}')
 
-    # Assign upcoming
-    upcoming, future = future[0], future[1:]
+    if future:
+        # Assign upcoming
+        upcoming, future = future[0], future[1:]
 
-    # Render upcoming
-    with open('layout/upcoming.pug', 'w') as f:
-        f.write('.row.mt-4.mb-2\n')
-        f.write('  h1 #[span.emoji 🚀] Upcoming\n')
-        f.write(render_talk(upcoming, True))
+        # Render upcoming
+        with open('layout/upcoming.pug', 'w') as f:
+            f.write('.row.mt-4.mb-2\n')
+            f.write('  h1 #[span.emoji 🚀] Upcoming\n')
+            f.write(render_talk(upcoming, True))
 
-    # Render future talks
-    with open('layout/next.pug', 'w') as f:
-        if future:
-            # Write the next n talks
-            for talk in future[:args.number]:
-                f.write(render_talk(talk))
-        else:
-            f.write('')
+        # Render next events
+        with open('layout/next.pug', 'w') as f:
+            if future:
+                # Write header
+                f.write('.row.mt-4.mb-4\n')
+                f.write('  h1 #[span.emoji 🔮] Next Events\n')
+
+                # Write the next n talks
+                for talk in future[:args.number]:
+                    f.write(render_talk(talk))
+            else:
+                # Empty next events
+                f.write('')
+
+    else:
+        # Empty upcoming
+        with open('layout/upcoming.pug', 'w') as f:
+            f.write('.row.mt-4.mb-2\n')
+            f.write('  h1 #[span.emoji 💀] No Events\n')
 
     # Render footer with date and hour
     with open('layout/footer.pug', 'w') as f:
