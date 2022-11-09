@@ -1,5 +1,5 @@
-from csv import DictReader
 from datetime import datetime as dt
+from icalendar import Calendar
 
 # Layout for the next talks
 raw = """
@@ -7,9 +7,8 @@ raw = """
   .col-2
     h3.mb-0 %%%DAY%%%
     h5.month.mb-0 %%%MONTH%%%
-    p %%%HOUR%%%
+    p.small %%%HOUR%%%-%%%END%%%
   .col-10
-    p.author #[span.me %%%AUTHOR%%%]
     h4.title.mb-1
       | %%%TITLE%%%
     p.address %%%LUOGO%%%"""
@@ -18,14 +17,13 @@ raw = """
 raw_upcoming = """
 .row.next
   .col-9
-    p.author #[span.me %%%AUTHOR%%%]
     h2.title.mb-0.mt-1
       | %%%TITLE%%%
     p.address %%%LUOGO%%%
   .col-2
     h1.day %%%DAY%%%
     h4.month.mb-0 %%%MONTH%%%
-    p %%%HOUR%%%
+    p %%%HOUR%%%-%%%END%%%
   .col-11
       p
         | %%%ABSTRACT%%%
@@ -45,9 +43,8 @@ def render_talk(talk: dict, upcoming: bool = False):
     The talk dictionary should contain
     the following keys:
     - Titolo
-    - Autore
-    - Data (in format %d/%m/%Y)
-    - Ora
+    - Inizio
+    - Fine
     - Abstract (optional)
     """
     if upcoming:
@@ -55,14 +52,11 @@ def render_talk(talk: dict, upcoming: bool = False):
     else:
         template = raw
 
-    # Parse date
-    date = dt.strptime(talk['Data'], '%d/%m/%Y')
-
     # Get month name
-    month = date.strftime('%B')
+    month = talk['Inizio'].strftime('%B')
 
     # Get cardinal day without leading zero
-    day = str(int(date.strftime('%d')))
+    day = str(int(talk['Inizio'].strftime('%d')))
 
     # Add suffix to day
     day += suffix(int(day))
@@ -70,18 +64,15 @@ def render_talk(talk: dict, upcoming: bool = False):
     # Build the output
     output = template.replace('%%%DAY%%%', day)
     output = output.replace('%%%MONTH%%%', month)
-    output = output.replace('%%%HOUR%%%', talk['Ora'])
+    output = output.replace('%%%HOUR%%%', dt.strftime(talk['Inizio'], '%H:%M'))
+    output = output.replace('%%%END%%%', dt.strftime(talk['Fine'], '%H:%M'))
     output = output.replace('%%%LUOGO%%%', talk['Luogo'])
-    output = output.replace('%%%AUTHOR%%%', talk['Autore'])
     output = output.replace('%%%TITLE%%%', talk['Titolo'])
 
     # Eventually add abstract
     if talk['Abstract'] and upcoming:
         lines = talk['Abstract'].split('\n')
         abstract = '#[br] \n        |'.join(lines)
-        # import sys
-        # print(abstract, file=sys.stderr)
-        # sys.exit(1)
         output = output.replace('%%%ABSTRACT%%%', abstract)
     else:
         output = output.replace('%%%ABSTRACT%%%', 'No abstract available')
@@ -103,7 +94,7 @@ if __name__ == '__main__':
 
     # Parse arguments
     parser = argparse.ArgumentParser(description='Render talks')
-    parser.add_argument('-n', '--number', type=int, default=4,
+    parser.add_argument('-n', '--number', type=int, default=5,
                         help='Number of talks to render')
     parser.add_argument('-d', '--date', type=str,
                         help='Render page for a specific date '
@@ -112,33 +103,35 @@ if __name__ == '__main__':
                         help='CSV file containing talks')
     args = parser.parse_args()
 
-    # Parse CSV file into a dictionary
-    with open(args.csv_filename, 'r') as fp:
-        csv_reader = DictReader(fp)
-        talks = list(csv_reader)
+    talks = []
+    with open(args.csv_filename, 'rb') as fp:
+        gcal = Calendar.from_ical(fp.read())
+        for component in gcal.walk():
+            if component.name == "VEVENT":
+                talks.append({
+                    'Titolo': component.get('summary'),
+                    'Inizio': component.get('dtstart').dt.astimezone(),
+                    'Fine': component.get('dtend').dt.astimezone(),
+                    'Luogo': component.get('location'),
+                    'Abstract': component.get('description')
+                })
 
-    # Get current datetime
+    # Get current date and time
     if not args.date:
-        now = dt.now()
+        now = dt.now().astimezone()
     else:
         now = dt.strptime(args.date, '%d/%m/%Y')
 
-    # Sort by time
-    talks.sort(key=lambda t: dt.strptime(t['Ora'], '%H:%M'))
-    # Sort by date
-    talks.sort(key=lambda t: dt.strptime(t['Data'], '%d/%m/%Y'))
-    # Put together date and time
-    for t in talks:
-        date = dt.strptime(t['Data'], '%d/%m/%Y')
-        time = dt.strptime(t['Ora'], '%H:%M')
-        t['datetime'] = dt(date.year, date.month, date.day,
-                           time.hour, time.minute)
-        if t['datetime'] > now:
-            print(f'Ok {t["Titolo"]} {t["datetime"]} {now}')
+    # Sort by start time
+    talks.sort(key=lambda t: t['Inizio'])
 
     # Filter talks
     talks = [talk for talk in talks if talk['Titolo']]
-    future = [talk for talk in talks if talk['datetime'] > now]
+    future = [talk for talk in talks if talk['Fine'] > now]
+
+    # Log future events
+    for t in future:
+        print(f'Ok {t["Titolo"]} {t["Inizio"]} {now}')
 
     # Assign upcoming
     upcoming, future = future[0], future[1:]
@@ -152,8 +145,6 @@ if __name__ == '__main__':
     # Render future talks
     with open('layout/next.pug', 'w') as f:
         if future:
-            f.write('.row.mt-4.mb-4\n')
-            f.write('  h1 #[span.emoji 🔮] Next Events\n')
             # Write the next n talks
             for talk in future[:args.number]:
                 f.write(render_talk(talk))

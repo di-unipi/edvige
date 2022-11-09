@@ -1,10 +1,14 @@
 extends layout.pug
 
 block content
-  .row
+  .row.pt-5.mt-2
     .col-md-6
       include upcoming
-    .col-md-6
+    .col-md-5
+      .row.mt-4.mb-4
+        h1 #[span.emoji 🔮] Next Events
       include next
-  .row.footer
+    .col-1
+      img(src='assets/qr.png',width='100%').float-end.rounded.mt-4.mb-4
+  .row.footer.mt-0
     include footer

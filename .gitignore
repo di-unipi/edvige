@@ -8,3 +8,4 @@ layout/next.pug
 layout/upcoming.pug
 log
 venv/
+basic.ics
