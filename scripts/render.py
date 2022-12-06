@@ -101,7 +101,13 @@ if __name__ == '__main__':
                              '(format: DD/MM/YYYY)')
     parser.add_argument('csv_filename', type=str,
                         help='CSV file containing talks')
+    parser.add_argument('showcase_filename', type=str,
+                        help='Markdown file containing the showcase',
+                        nargs='?')
     args = parser.parse_args()
+
+    # Assign arguments
+    showcase = args.showcase_filename
 
     talks = []
     with open(args.csv_filename, 'rb') as fp:
@@ -133,15 +139,25 @@ if __name__ == '__main__':
     for t in future:
         print(f'Ok {t["Titolo"]} {t["Inizio"]} {now}')
 
+    # Check if there are future events
     if future:
-        # Assign upcoming
-        upcoming, future = future[0], future[1:]
 
-        # Render upcoming
-        with open('layout/upcoming.pug', 'w') as f:
-            f.write('.row.mt-4.mb-2\n')
-            f.write('  h1 #[span.emoji 🚀] Upcoming\n')
-            f.write(render_talk(upcoming, True))
+        # There is not a showcase event
+        if not showcase:
+            # Assign upcoming
+            upcoming, future = future[0], future[1:]
+
+            # Render upcoming
+            with open('layout/upcoming.pug', 'w') as f:
+                f.write('.row.mt-4.mb-2\n')
+                f.write('  h1 #[span.emoji 🚀] Upcoming\n')
+                f.write(render_talk(upcoming, True))
+        else:
+            with open('layout/upcoming.pug', 'w') as f:
+                f.write('.row.mt-4.mb-2.justify-content-center\n')
+                f.write("  include:markdown-it(linkify"
+                        "langPrefix='highlight-' html='true')"
+                        " ../showcase.md")
 
         # Render next events
         with open('layout/next.pug', 'w') as f:
@@ -158,8 +174,14 @@ if __name__ == '__main__':
                 f.write('')
 
     else:
+        # There is not a showcase event
+        if not showcase:
+            fname = 'layout/upcoming.pug'
+        else:
+            fname = 'layout/next.pug'
+
         # Empty upcoming
-        with open('layout/upcoming.pug', 'w') as f:
+        with open(fname, 'w') as f:
             f.write('.row.mt-4.mb-2\n')
             f.write('  h1 #[span.emoji 💀] No Events\n')
 

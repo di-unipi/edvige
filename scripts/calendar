@@ -1,8 +1,19 @@
 #! /bin/bash
+set -e 
 
 # Update Calendar Visualization
-python3 scripts/downloader.py >> log &&
-python3 scripts/render.py basic.ics >> log &&
-node_modules/.bin/pug --doctype html --pretty layout/index.pug --out . &&
-mv index.html www/index.html &&
+python3 scripts/downloader.py >> log
+
+# Check if exists a showcase
+if [ -f showcase.md ]; then
+  python3 scripts/render.py basic.ics showcase.md >> log
+else
+  python3 scripts/render.py basic.ics >> log
+fi
+
+# Pug rendering
+node_modules/.bin/pug --doctype html --pretty layout/index.pug --out .
+
+# Move to folder
+mv index.html www/index.html
 date >> log

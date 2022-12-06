@@ -1,4 +1,5 @@
 *.DS_Store*
+showcase.md
 .idea/
 credentials.json
 events.csv
