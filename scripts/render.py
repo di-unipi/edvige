@@ -1,5 +1,6 @@
 from datetime import datetime as dt
 from icalendar import Calendar
+from bs4 import BeautifulSoup
 
 # Layout for the next talks
 raw = """
@@ -26,8 +27,22 @@ raw_upcoming = """
     p %%%HOUR%%%-%%%END%%%
   .col-11
       p
-        | %%%ABSTRACT%%%
-      """
+        | %%%ABSTRACT%%%"""
+
+# Layout for the next talks
+raw_second = """
+.row.project
+  .col-2
+    h3.mb-0 %%%DAY%%%
+    h5.month.mb-0 %%%MONTH%%%
+    p.small %%%HOUR%%%-%%%END%%%
+  .col-10
+    h4.title.mb-1
+      | %%%TITLE%%%
+    p.address.mb-1 %%%LUOGO%%%
+    p.shortabs
+      | %%%ABSTRACT%%%"""
+
 
 # Footer
 raw_footer = """
@@ -38,7 +53,7 @@ raw_footer = """
 """
 
 
-def render_talk(talk: dict, upcoming: bool = False):
+def render_talk(talk: dict, upcoming: bool = False, second: bool = False):
     """
     The talk dictionary should contain
     the following keys:
@@ -49,6 +64,8 @@ def render_talk(talk: dict, upcoming: bool = False):
     """
     if upcoming:
         template = raw_upcoming
+    elif second:
+        template = raw_second
     else:
         template = raw
 
@@ -70,9 +87,25 @@ def render_talk(talk: dict, upcoming: bool = False):
     output = output.replace('%%%TITLE%%%', talk['Titolo'])
 
     # Eventually add abstract
-    if talk['Abstract'] and upcoming:
-        lines = talk['Abstract'].split('\n')
-        abstract = '#[br] \n        |'.join(lines)
+    if talk['Abstract'] and (upcoming or second):
+        # Retrieve abstract
+        abstract = talk['Abstract']
+        # Shorten abstract
+        if second:
+            # Load abstract
+            soup = BeautifulSoup(abstract,
+                                 features='lxml')
+            # Get text
+            abstract = soup.get_text(strip=False)
+            # Keep only first 350 characters
+            abstract = abstract[:350] + '...'
+
+        lines = abstract.split('\n')
+        if upcoming:
+            abstract = '#[br] \n        |'.join(lines)
+        else:
+            abstract = '#[br] \n      |'.join(lines)
+
         output = output.replace('%%%ABSTRACT%%%', abstract)
     else:
         output = output.replace('%%%ABSTRACT%%%', 'No abstract available')
@@ -150,7 +183,7 @@ if __name__ == '__main__':
             # Render upcoming
             with open('layout/upcoming.pug', 'w') as f:
                 f.write('.row.mt-4.mb-2\n')
-                f.write('  h1 #[span.emoji 🚀] Upcoming\n')
+                f.write('  h1 #[span.emoji 🚀] Upcoming')
                 f.write(render_talk(upcoming, True))
         else:
             with open('layout/upcoming.pug', 'w') as f:
@@ -167,8 +200,10 @@ if __name__ == '__main__':
                 f.write('  h1 #[span.emoji 🔮] Next Events\n')
 
                 # Write the next n talks
+                second = True
                 for talk in future[:args.number]:
-                    f.write(render_talk(talk))
+                    f.write(render_talk(talk, second=second))
+                    second = False
             else:
                 # Empty next events
                 f.write('')
