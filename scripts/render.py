@@ -83,7 +83,10 @@ def render_talk(talk: dict, upcoming: bool = False, second: bool = False):
     output = output.replace('%%%MONTH%%%', month)
     output = output.replace('%%%HOUR%%%', dt.strftime(talk['Inizio'], '%H:%M'))
     output = output.replace('%%%END%%%', dt.strftime(talk['Fine'], '%H:%M'))
-    output = output.replace('%%%LUOGO%%%', talk['Luogo'])
+    if talk['Luogo'] is not None:
+        output = output.replace('%%%LUOGO%%%', talk['Luogo'])
+    else:
+        output = output.replace('%%%LUOGO%%%', 'Not Available')
     output = output.replace('%%%TITLE%%%', talk['Titolo'])
 
     # Eventually add abstract
