@@ -13,6 +13,7 @@ body {
   animation-duration: 10s;
   color: #E4E7EB;
   height: 100%;
+  overflow: hidden;
 }
 
 .shortabs {
