@@ -111,7 +111,7 @@ def render_talk(talk: dict, upcoming: bool = False, second: bool = False):
 
         output = output.replace('%%%ABSTRACT%%%', abstract)
     else:
-        output = output.replace('%%%ABSTRACT%%%', 'No abstract available')
+        output = output.replace('%%%ABSTRACT%%%', 'No abstract available.')
 
     return output
 
