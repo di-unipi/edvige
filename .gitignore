@@ -11,3 +11,4 @@ log
 venv/
 basic.ics
 node_modules
+*.log
