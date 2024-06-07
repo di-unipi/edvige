@@ -1,4 +1,9 @@
+"""
+Render in Pug format the next talks
+"""
 from datetime import datetime as dt
+import random
+
 from icalendar import Calendar
 from bs4 import BeautifulSoup
 
@@ -171,9 +176,18 @@ if __name__ == '__main__':
 
     # Check if there are future events
     if future:
+        # Get the day of the first upcoming talk
+        upcoming_day = future[0].get('Inizio').day
 
-        # Assign upcoming
-        upcoming, future = future[0], future[1:]
+        # Select upcoming talks for the same day
+        upcoming_talks = [talk for talk in future if talk['Inizio'].day == upcoming_day]
+
+        # Randomly assign upcoming
+        upcoming_idx = random.randint(0, len(upcoming_talks) - 1)
+        upcoming = future[upcoming_idx]
+
+        # Remove upcoming from future
+        future = future[:upcoming_idx] + future[upcoming_idx + 1:]
 
         # Render upcoming
         with open('layout/upcoming.pug', 'w') as f:
