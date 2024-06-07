@@ -2,6 +2,7 @@
 set -e 
 
 # Log
+mkdir -p logs/
 echo "Start $(date)" >> logs/calendar.log
 
 # Update Calendar Visualization
