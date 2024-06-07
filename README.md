@@ -6,13 +6,10 @@ of the [Department of Computer Science](https://di.unipi.it)
 at the University of Pisa.
 In this repository,
 you will find the code
-to serve our website,
+to serve our public calendar,
 which we currently screencast
 near the coffee machines. ☕
 
-This amount of spaghetti
-that we love to call codebase
-depends on various tools.
 Assuming that you already installed
 `npm` for
 [NodeJS](https://nodejs.org/en/)
