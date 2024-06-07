@@ -2,23 +2,25 @@
 set -e 
 
 # Log
-echo Start >> log
-date >> log
+echo "Start `date`" >> calendar.log
 
 # Update Calendar Visualization
-python3 scripts/downloader.py >> log
+python3 scripts/downloader.py basic.ics >> calendar.log
 
 # Check if exists a showcase
-if [ -f showcase.md ]; then
-  python3 scripts/render.py basic.ics showcase.md >> log
-else
-  python3 scripts/render.py basic.ics >> log
-fi
+python3 scripts/render.py basic.ics >> calendar.log
 
 # Pug rendering
 node_modules/.bin/pug --doctype html --pretty layout/index.pug --out .
 
+# Remove temporary pug files
+rm -f layout/footer.pug
+rm -f layout/next.pug
+rm -f layout/upcoming.pug
+rm -f basic.ics
+
 # Move to folder
+cp -r static www/
 mv index.html www/index.html
-echo End >> log
-date >> log
+
+echo "End `date`" >> calendar.log
