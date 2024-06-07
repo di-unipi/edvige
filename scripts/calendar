@@ -1,6 +1,10 @@
 #! /bin/bash
 set -e 
 
+# Log
+echo Start >> log
+date >> log
+
 # Update Calendar Visualization
 python3 scripts/downloader.py >> log
 
@@ -16,4 +20,5 @@ node_modules/.bin/pug --doctype html --pretty layout/index.pug --out .
 
 # Move to folder
 mv index.html www/index.html
+echo End >> log
 date >> log

@@ -25,7 +25,7 @@ raw_upcoming = """
     h1.day %%%DAY%%%
     h4.month.mb-0 %%%MONTH%%%
     p %%%HOUR%%%-%%%END%%%
-  .col-11
+  .col-11.abstract
       p
         | %%%ABSTRACT%%%"""
 

@@ -8,7 +8,7 @@ html {
 body {
   background: linear-gradient(#1F2933, #303030, #1F2933 50%, #303030, #1F2933);
   background-size: 100% 200%;
-  animation-iteration-count: infinite;
+  animation-iteration-count: 1;
   animation-name: gradient;
   animation-duration: 10s;
   color: #E4E7EB;
@@ -21,12 +21,14 @@ body {
 }
 
 @keyframes gradient {
-	0% {
-		background-position: 0% 00%;
-	}
-	100% {
-		background-position: 0% 100%;
-	}
+  0% {
+    background-position: 0% 00%;
+    opacity: 0.1
+  }
+  100% {
+    background-position: 0% 100%;
+    opacity: 1.0
+  }
 }
 
 i {
@@ -94,7 +96,8 @@ mark {
 }
 
 .abstract {
-  color: #9AA5B1;
+  /* color: #9AA5B1; */
+  font-size: 15px;
 }
 
 ul {
