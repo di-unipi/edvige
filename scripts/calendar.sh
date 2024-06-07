@@ -21,6 +21,7 @@ rm -f layout/upcoming.pug
 rm -f basic.ics
 
 # Move to folder
+rm -r www/
 cp -r static www/
 mv index.html www/index.html
 
