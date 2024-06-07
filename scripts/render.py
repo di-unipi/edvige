@@ -1,4 +1,9 @@
+"""
+Render in Pug format the next talks
+"""
 from datetime import datetime as dt
+import random
+
 from icalendar import Calendar
 from bs4 import BeautifulSoup
 
@@ -137,13 +142,7 @@ if __name__ == '__main__':
                              '(format: DD/MM/YYYY)')
     parser.add_argument('csv_filename', type=str,
                         help='CSV file containing talks')
-    parser.add_argument('showcase_filename', type=str,
-                        help='Markdown file containing the showcase',
-                        nargs='?')
     args = parser.parse_args()
-
-    # Assign arguments
-    showcase = args.showcase_filename
 
     talks = []
     with open(args.csv_filename, 'rb') as fp:
@@ -177,23 +176,24 @@ if __name__ == '__main__':
 
     # Check if there are future events
     if future:
+        # Get the day of the first upcoming talk
+        upcoming_day = future[0].get('Inizio').day
 
-        # There is not a showcase event
-        if not showcase:
-            # Assign upcoming
-            upcoming, future = future[0], future[1:]
+        # Select upcoming talks for the same day
+        upcoming_talks = [talk for talk in future if talk['Inizio'].day == upcoming_day]
 
-            # Render upcoming
-            with open('layout/upcoming.pug', 'w') as f:
-                f.write('.row.mt-4.mb-2\n')
-                f.write('  h1 #[span.emoji 🚀] Upcoming')
-                f.write(render_talk(upcoming, True))
-        else:
-            with open('layout/upcoming.pug', 'w') as f:
-                f.write('.row.mt-4.mb-2.justify-content-center\n')
-                f.write("  include:markdown-it(linkify"
-                        "langPrefix='highlight-' html='true')"
-                        " ../showcase.md")
+        # Randomly assign upcoming
+        upcoming_idx = random.randint(0, len(upcoming_talks) - 1)
+        upcoming = future[upcoming_idx]
+
+        # Remove upcoming from future
+        future = future[:upcoming_idx] + future[upcoming_idx + 1:]
+
+        # Render upcoming
+        with open('layout/upcoming.pug', 'w') as f:
+            f.write('.row.mt-4.mb-2\n')
+            f.write('  h1 #[span.emoji 🚀] Upcoming')
+            f.write(render_talk(upcoming, True))
 
         # Render next events
         with open('layout/next.pug', 'w') as f:
@@ -212,16 +212,12 @@ if __name__ == '__main__':
                 f.write('')
 
     else:
-        # There is not a showcase event
-        if not showcase:
-            fname = 'layout/upcoming.pug'
-        else:
-            fname = 'layout/next.pug'
-
         # Empty upcoming
-        with open(fname, 'w') as f:
+        with open('layout/upcoming.pug', 'w') as f:
             f.write('.row.mt-4.mb-2\n')
             f.write('  h1 #[span.emoji 💀] No Events\n')
+        with open('layout/next.pug', 'w') as f:
+            f.write('')
 
     # Render footer with date and hour
     with open('layout/footer.pug', 'w') as f:

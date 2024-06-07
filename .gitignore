@@ -1,14 +1,3 @@
-*.DS_Store*
-showcase.md
-.idea/
-credentials.json
-events.csv
-index.html
-layout/footer.pug
-layout/next.pug
-layout/upcoming.pug
-log
-venv/
-basic.ics
-node_modules
-*.log
+logs/
+node_modules/
+www/

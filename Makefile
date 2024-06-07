@@ -1,2 +1,2 @@
 deploy:
-	rsync -avz --delete ./ edvige:edvige/
+	rsync -avz --delete --exclude ".git*" --exclude "node_modules/" --exclude "www/" --exclude "Makefile" --exclude "logs/" --exclude "www/" ./ edvige:edvige/

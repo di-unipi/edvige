@@ -3,7 +3,7 @@
     "pug-cli": "^1.0.0-alpha6"
   },
   "scripts": {
-    "calendar": "scripts/calendar",
+    "calendar": "bash scripts/calendar.sh",
     "install": "pip3 install -r requirements.txt"
   }
 }
