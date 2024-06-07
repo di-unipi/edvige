@@ -34,3 +34,29 @@ upcoming events.
 ```bash
 npm run calendar
 ```
+
+## Workflow
+
+This repository is downloaded on a Raspberry Pi 2
+that renders and serves the web page.
+Due to the limited computational power of the device,
+we render the page offline
+and just visualize it
+in the browser.
+Every five minutes,
+a cronjob
+runs the `npm run calendar` command
+that
+
+1. Downloads the `ics` file from Google Calendar
+2. Renders the webpage and its dependecies in the `www` folder
+
+
+Cronjob
+
+```
+*/5 9-18 * * 1-5 cd /home/pi/edvige && bash scripts/calendar.sh && bash scripts/refresh_firefox.sh
+30 18 * * 1-5 cd /home/pi/edvige/ && bash scripts/refresh_pixels.sh
+30 8  * * 1-5 export DISPLAY=":0.0"; xrandr --output HDMI-1 --auto
+40 18 * * 1-5 export DISPLAY=":0.0"; xrandr --output HDMI-1 --off
+```
