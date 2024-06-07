@@ -2,12 +2,12 @@
 set -e 
 
 # Log
-echo "Start `date`" >> calendar.log
+echo "Start $(date)" >> calendar.log
 
 # Update Calendar Visualization
 python3 scripts/downloader.py basic.ics >> calendar.log
 
-# Check if exists a showcase
+# Render the pug files
 python3 scripts/render.py basic.ics >> calendar.log
 
 # Pug rendering
@@ -23,4 +23,4 @@ rm -f basic.ics
 cp -r static www/
 mv index.html www/index.html
 
-echo "End `date`" >> calendar.log
+echo "End $(date)" >> calendar.log
