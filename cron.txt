@@ -22,8 +22,8 @@
 # 
 # m h  dom mon dow   command
 #@daily cd /home/pi/edvige && ./run.sh
-*/5 9-18 * * 1-5 cd /home/pi/edvige && npm run calendar && bash refresh_firefox.sh
-30 18 * * 1-5 cd /home/pi/edvige/ && bash refresh_pixels.sh
+*/5 9-18 * * 1-5 cd /home/pi/edvige && bash scripts/calendar.sh && bash scripts/refresh_firefox.sh
+30 18 * * 1-5 cd /home/pi/edvige/ && bash scripts/refresh_pixels.sh
 30 8  * * 1-5 export DISPLAY=":0.0"; xrandr --output HDMI-1 --auto
 40 18 * * 1-5 export DISPLAY=":0.0"; xrandr --output HDMI-1 --off
 # 55 7  * * 1-5 vcgencmd display_power 1
