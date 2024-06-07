@@ -4,14 +4,9 @@
 # Set display for xdotool
 export DISPLAY=":0.0"
 
-# Get path of script
-SCRIPT_PATH="$(dirname "$(realpath "$0")")"
-# Create log file
-LOGFILE="$SCRIPT_PATH/refresh_pixels.log"
-
 # Logging function to file ([YYYY-MM-DD HH:MM:SS] $1)
 function log {
-  echo "[$(date +"%Y-%m-%d %H:%M:%S")] $1" >> "$LOGFILE"
+  echo "[$(date +"%Y-%m-%d %H:%M:%S")] $1" >> refresh_pixels.log
 }
 
 # Get the window ID
