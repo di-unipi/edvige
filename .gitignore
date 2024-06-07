@@ -1,4 +1,3 @@
+logs/
+node_modules/
 www/
-node_modules
-*.log
-

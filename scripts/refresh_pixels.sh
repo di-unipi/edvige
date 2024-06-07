@@ -6,7 +6,7 @@ export DISPLAY=":0.0"
 
 # Logging function to file ([YYYY-MM-DD HH:MM:SS] $1)
 function log {
-  echo "[$(date +"%Y-%m-%d %H:%M:%S")] $1" >> refresh_pixels.log
+  echo "[$(date +"%Y-%m-%d %H:%M:%S")] $1" >> logs/refresh_pixels.log
 }
 
 # Get the window ID
