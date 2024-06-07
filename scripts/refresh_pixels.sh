@@ -29,7 +29,7 @@ xdotool windowactivate "$WID"
 xdotool key ctrl+t
 log "Opened new tab"
 sleep 1
-xdotool type "file:///home/pi/random/index.html"
+xdotool type "file:///home/pi/edvige/www/random/index.html"
 log "Typed URL"
 sleep 2
 xdotool key KP_Enter
