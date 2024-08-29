@@ -21,7 +21,7 @@ rm -f layout/upcoming.pug
 rm -f basic.ics
 
 # Move to folder
-cp -r static www/
+cp -r static/* www/
 mv index.html www/index.html
 
 echo "End $(date)" >> logs/calendar.log
