@@ -16,8 +16,7 @@ node_modules/.bin/pug --doctype html --pretty layout/index.pug --out .
 
 # Remove temporary pug files
 rm -f layout/footer.pug
-rm -f layout/next.pug
-rm -f layout/upcoming.pug
+rm -f layout/events.pug
 rm -f basic.ics
 
 # Move to folder

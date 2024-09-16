@@ -1,226 +1,187 @@
 """
 Render in Pug format the next talks
 """
+
+import re
 from datetime import datetime as dt
-import random
+from typing import Optional
 
-from icalendar import Calendar
-from bs4 import BeautifulSoup
-
-# Layout for the next talks
-raw = """
-.row.project
-  .col-2
-    h3.mb-0 %%%DAY%%%
-    h5.month.mb-0 %%%MONTH%%%
-    p.small %%%HOUR%%%-%%%END%%%
-  .col-10
-    h4.title.mb-1
-      | %%%TITLE%%%
-    p.address %%%LUOGO%%%"""
-
-# Layout for the upcoming talk
-raw_upcoming = """
-.row.next
-  .col-9
-    h2.title.mb-0.mt-1
-      | %%%TITLE%%%
-    p.address %%%LUOGO%%%
-  .col-2
-    h1.day %%%DAY%%%
-    h4.month.mb-0 %%%MONTH%%%
-    p %%%HOUR%%%-%%%END%%%
-  .col-11.abstract
-      p
-        | %%%ABSTRACT%%%"""
-
-# Layout for the next talks
-raw_second = """
-.row.project
-  .col-2
-    h3.mb-0 %%%DAY%%%
-    h5.month.mb-0 %%%MONTH%%%
-    p.small %%%HOUR%%%-%%%END%%%
-  .col-10
-    h4.title.mb-1
-      | %%%TITLE%%%
-    p.address.mb-1 %%%LUOGO%%%
-    p.shortabs
-      | %%%ABSTRACT%%%"""
+import fire  # type: ignore
+from bs4 import BeautifulSoup  # type: ignore
+from icalendar import Calendar  # type: ignore
 
 
-# Footer
-raw_footer = """
-.col-6
-    p Last update: %%%DATE%%% at %%%HOUR%%%
-.col-6.text-end
-    p Made with ❤️ by 🦉
-"""
+def suffix(d: int) -> str:
+    """Returns the correct suffix for a given day of the month."""
+    return (
+        "th"
+        if 11 <= d <= 13
+        else {1: "st", 2: "nd", 3: "rd"}.get(d % 10, "th")
+    )
 
 
-def render_talk(talk: dict, upcoming: bool = False, second: bool = False):
-    """
-    The talk dictionary should contain
-    the following keys:
-    - Titolo
-    - Inizio
-    - Fine
-    - Abstract (optional)
-    """
-    if upcoming:
-        template = raw_upcoming
-    elif second:
-        template = raw_second
-    else:
-        template = raw
-
-    # Get month name
-    month = talk['Inizio'].strftime('%B')
-
+def render_info(start: dt, end: dt, location: str) -> str:
+    """Renders the datetime object from the start and end time."""
     # Get cardinal day without leading zero
-    day = str(int(talk['Inizio'].strftime('%d')))
-
+    day = str(int(start.strftime("%d")))
     # Add suffix to day
     day += suffix(int(day))
 
-    # Build the output
-    output = template.replace('%%%DAY%%%', day)
-    output = output.replace('%%%MONTH%%%', month)
-    output = output.replace('%%%HOUR%%%', dt.strftime(talk['Inizio'], '%H:%M'))
-    output = output.replace('%%%END%%%', dt.strftime(talk['Fine'], '%H:%M'))
-    if talk['Luogo'] is not None:
-        output = output.replace('%%%LUOGO%%%', talk['Luogo'])
-    else:
-        output = output.replace('%%%LUOGO%%%', 'Not Available')
-    output = output.replace('%%%TITLE%%%', talk['Titolo'])
+    # Get month name
+    month = start.strftime("%B")
 
-    # Eventually add abstract
-    if talk['Abstract'] and (upcoming or second):
-        # Retrieve abstract
-        abstract = talk['Abstract']
-        # Shorten abstract
-        if second:
-            # Load abstract
-            soup = BeautifulSoup(abstract,
-                                 features='lxml')
-            # Get text
-            abstract = soup.get_text(strip=False)
-            # Keep only first 350 characters
-            abstract = abstract[:350] + '...'
+    # Start time and end time
+    start_time = start.strftime("%H:%M")
+    end_time = end.strftime("%H:%M")
 
-        lines = abstract.split('\n')
-        if upcoming:
-            abstract = '#[br] \n        |'.join(lines)
-        else:
-            abstract = '#[br] \n      |'.join(lines)
-
-        output = output.replace('%%%ABSTRACT%%%', abstract)
-    else:
-        output = output.replace('%%%ABSTRACT%%%', 'No abstract available.')
-
-    return output
+    # Compose and return the object
+    dt_pug = f"h3.mb-0 {day}\n"
+    dt_pug += f"h5.month.mb-0 {month}\n"
+    dt_pug += f"p.small {start_time}-{end_time}\n"
+    dt_pug += f"p.small {location}"
+    return dt_pug
 
 
-def suffix(d: int):
-    """
-    Returns the correct suffix for
-    a given day of the month.
-    """
-    return 'th' if 11 <= d <= 13 \
-        else {1: 'st', 2: 'nd', 3: 'rd'}.get(d % 10, 'th')
+def render_footer() -> str:
+    """Renders the footer"""
+    now = dt.now().astimezone()
+    footer_pug = ".col-6\n"
+    footer_pug += f"    p Last update: {now.strftime('%d/%m/%Y')} at {now.strftime('%H:%M')}\n"
+    footer_pug += ".col-6.text-end\n"
+    footer_pug += "    p Made with ❤️ by 🦉\n"
+    return footer_pug
 
 
-if __name__ == '__main__':
-    import argparse
+def parse_title(title: str) -> tuple[str, str]:
+    """Parse the title"""
+    # Check if it matches [TYPE] Title (Speaker name, Institution)
+    pattern = re.compile(
+        r"\[(?P<type>.+)\] (?P<title>.+) \((?P<speaker>.+), (?P<institution>.+)\)"
+    )
+    match = pattern.match(title)
+    if match:
+        title = match.group("title")
+        subtitle = f'{match.group("speaker")}, {match.group("institution")}'
+        hashtags = match.group("type").split(",")
+        hashtags = [
+            f'<span class="hashtag">#{h.strip()}</span>' for h in hashtags
+        ]
+        subtitle += '<div class="hashtags">' + " ".join(hashtags) + "</div>"
+        return title, subtitle
 
-    # Parse arguments
-    parser = argparse.ArgumentParser(description='Render talks')
-    parser.add_argument('-n', '--number', type=int, default=5,
-                        help='Number of talks to render')
-    parser.add_argument('-d', '--date', type=str,
-                        help='Render page for a specific date '
-                             '(format: DD/MM/YYYY)')
-    parser.add_argument('csv_filename', type=str,
-                        help='CSV file containing talks')
-    args = parser.parse_args()
+    # Try then to match [TYPE] Title (Speaker name)
+    pattern = re.compile(r"\[(?P<type>.+)\] (?P<title>.+) \((?P<speaker>.+)\)")
+    match = pattern.match(title)
+    if match:
+        title = match.group("title")
+        subtitle = f'{match.group("speaker")}'
+        hashtags = match.group("type").split(",")
+        hashtags = [
+            f'<span class="hashtag">#{h.strip()}</span>' for h in hashtags
+        ]
+        subtitle += '<div class="hashtags">' + " ".join(hashtags) + "</div>"
+        return title, subtitle
 
+    return title, ""
+
+
+def render_card(talk: dict) -> str:
+    """Renders the card"""
+
+    # Parse title
+    title, subtitle = parse_title(talk["Titolo"])
+
+    # Get the datetime object
+    dt_pug = render_info(talk["Inizio"], talk["Fine"], talk["Luogo"])
+
+    # Get the abstract
+    abstract = talk["Abstract"]
+    if abstract:
+        # Load abstract
+        soup = BeautifulSoup(abstract, features="lxml")
+        # Get text
+        abstract = soup.get_text(strip=False)
+        # Keep only first 350 characters
+        abstract = abstract[:350] + "..."
+        # Split by lines
+        lines = abstract.split("\n")
+        abstract = "#[br] \n            |".join(lines)
+
+    # Compose the card
+    card_pug = ".col\n"
+    card_pug += "  .card.mb-3.h-100\n"
+    card_pug += "    .row.h-100.g-0\n"
+    card_pug += "      .col-md-3\n"
+    card_pug += "        .info\n"
+    for line in dt_pug.split("\n"):
+        card_pug += f"          {line}\n"
+    card_pug += "      .col-md-9\n"
+    card_pug += "        .card-body\n"
+    card_pug += "          h5.card-title\n"
+    card_pug += f"            | {title}\n"
+    if subtitle:
+        card_pug += "          h6.card-subtitle.mb-2.text-body-secondary\n"
+        card_pug += f"            | {subtitle}\n"
+    if abstract:
+        card_pug += "          p.card-text\n"
+        card_pug += f"            | {abstract}\n"
+    return card_pug
+
+
+def main(
+    csv_filename: str, date: Optional[str] = None, number: Optional[int] = 9
+):
+    """Main"""
     talks = []
-    with open(args.csv_filename, 'rb') as fp:
-        gcal = Calendar.from_ical(fp.read())
+    with open(csv_filename, "rb") as fp:
+        # Read file as a string
+        file = fp.read().decode("utf-8")
+        gcal = Calendar.from_ical(file)
         for component in gcal.walk():
             if component.name == "VEVENT":
-                talks.append({
-                    'Titolo': component.get('summary'),
-                    'Inizio': component.get('dtstart').dt.astimezone(),
-                    'Fine': component.get('dtend').dt.astimezone(),
-                    'Luogo': component.get('location'),
-                    'Abstract': component.get('description')
-                })
+                talks.append(
+                    {
+                        "Titolo": component.get("summary"),
+                        "Inizio": component.get("dtstart").dt.astimezone(),
+                        "Fine": component.get("dtend").dt.astimezone(),
+                        "Luogo": component.get("location"),
+                        "Abstract": component.get("description"),
+                    }
+                )
 
     # Get current date and time
-    if not args.date:
+    if not date:
         now = dt.now().astimezone()
     else:
-        now = dt.strptime(args.date, '%d/%m/%Y')
+        now = dt.strptime(date, "%d/%m/%Y").astimezone()
 
     # Sort by start time
-    talks.sort(key=lambda t: t['Inizio'])
+    talks.sort(key=lambda t: t["Inizio"])
 
     # Filter talks
-    talks = [talk for talk in talks if talk['Titolo']]
-    future = [talk for talk in talks if talk['Fine'] > now]
+    talks = [talk for talk in talks if talk["Titolo"]]
+    future = [talk for talk in talks if talk["Fine"] > now]
+
+    # Get the number of events to render
+    if number is None:
+        number = len(future)
 
     # Log future events
     for t in future:
-        print(f'Ok {t["Titolo"]} {t["Inizio"]} {now}')
+        print(f'[{now}] Read {t["Titolo"]} {t["Inizio"]}')
 
-    # Check if there are future events
-    if future:
-        # Get the day of the first upcoming talk
-        upcoming_day = future[0].get('Inizio').day
+    # Render future events
+    with open("layout/events.pug", "w", encoding="utf-8") as f:
+        if future:
+            for talk in future[:number]:
+                f.write(render_card(talk))
+                print(f'[{now}] Wrote {talk["Titolo"]} {talk["Inizio"]}')
 
-        # Select upcoming talks for the same day
-        upcoming_talks = [talk for talk in future if talk['Inizio'].day == upcoming_day]
-
-        # Randomly assign upcoming
-        upcoming_idx = random.randint(0, len(upcoming_talks) - 1)
-        upcoming = future[upcoming_idx]
-
-        # Remove upcoming from future
-        future = future[:upcoming_idx] + future[upcoming_idx + 1:]
-
-        # Render upcoming
-        with open('layout/upcoming.pug', 'w') as f:
-            f.write('.row.mt-4.mb-2\n')
-            f.write('  h1 #[span.emoji 🚀] Upcoming')
-            f.write(render_talk(upcoming, True))
-
-        # Render next events
-        with open('layout/next.pug', 'w') as f:
-            if future:
-                # Write header
-                f.write('.row.mt-4.mb-4\n')
-                f.write('  h1 #[span.emoji 🔮] Next Events\n')
-
-                # Write the next n talks
-                second = True
-                for talk in future[:args.number]:
-                    f.write(render_talk(talk, second=second))
-                    second = False
-            else:
-                # Empty next events
-                f.write('')
-
-    else:
-        # Empty upcoming
-        with open('layout/upcoming.pug', 'w') as f:
-            f.write('.row.mt-4.mb-2\n')
-            f.write('  h1 #[span.emoji 💀] No Events\n')
-        with open('layout/next.pug', 'w') as f:
-            f.write('')
-
-    # Render footer with date and hour
-    with open('layout/footer.pug', 'w') as f:
-        footer = raw_footer.replace('%%%DATE%%%', now.strftime('%d/%m/%Y'))
-        footer = footer.replace('%%%HOUR%%%', now.strftime('%H:%M'))
+    # Render footer
+    with open("layout/footer.pug", "w", encoding="utf-8") as f:
+        footer = render_footer()
         f.write(footer)
+
+
+if __name__ == "__main__":
+    fire.Fire(main)
