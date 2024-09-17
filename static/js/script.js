@@ -14,9 +14,7 @@ var col_height = 900;
 console.log('Left height: ' + col_height);
 
 // Initialize usage
-let used_left = 0;
-let used_center = 0;
-let used_right = 0;
+let used = [0, 0, 0];
 
 // Iterate over left column childs and remove them
 let cards = [];
@@ -25,7 +23,7 @@ for (elem of left_column.children) {
     // Check if the element is a card
     if (!elem.classList.contains('card')) {
         height = elem.offsetHeight;
-        used_left += height;
+        used[0] += height;
         continue;
     }
     height = elem.offsetHeight;
@@ -41,6 +39,18 @@ for (card of cards) {
     left_column.removeChild(card);
 }
 
+function get_column(column_id) {
+    if (column_id == 0) {
+        return document.getElementById('left');
+    } else if (column_id == 1) {
+        return document.getElementById('center');
+    } else {
+        return document.getElementById('right');
+    }
+}
+
+let current = 0;
+let full = false;
 for (let i = 0; i < cards.length; i++) {
     // Get the card
     let card = cards[i];
@@ -49,21 +59,27 @@ for (let i = 0; i < cards.length; i++) {
     // Log
     console.log('Card: n.' + i);
     console.log('Card height: ' + card_height);
-    console.log('Used left: ' + used_left);
-    console.log('Used center: ' + used_center);
-    console.log('Used right: ' + used_right);
+    console.log('Used: ' + used);
 
-    // Check if the card fits in the left column
-    if (used_left + card_height <= col_height) {
-        left_column.appendChild(card);
-        used_left += card_height;
-    } else if (used_center + card_height <= col_height) {
-        document.getElementById('center').appendChild(card);
-        used_center += card_height;
-    } else if (used_right + card_height <= col_height) {
-        document.getElementById('right').appendChild(card);
-        used_right += card_height;
-    } else {
-        console.log('Discarding card: ' + card);
+    // Check if there are free columns
+    while (used[current] + card_height > col_height) {
+        current++;
+        if (current >= 3) {
+            full = true;
+            break;
+        }
     }
+
+    // Check if the columns are full
+    if (full) {
+        console.log('Stop inserting after card: ' + i);
+        console.log('Remaining cards: ' + cards.length - i);
+        break;
+    }
+
+    // Insert the card
+    get_column(current).appendChild(card);
+    used[current] += card_height;
+
+    console.log('Used after insert: ' + used);
 }
