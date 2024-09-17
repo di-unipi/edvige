@@ -101,30 +101,31 @@ def render_card(talk: dict) -> str:
         soup = BeautifulSoup(abstract, features="lxml")
         # Get text
         abstract = soup.get_text(strip=False)
-        # Keep only first 350 characters
-        abstract = abstract[:350] + "..."
+        # Keep only first 500 characters
+        abstract = abstract[:500] + "..."
         # Split by lines
         lines = abstract.split("\n")
-        abstract = "#[br] \n            |".join(lines)
+        abstract = "#[br] \n          | ".join(lines)
 
     # Compose the card
-    card_pug = ".col\n"
-    card_pug += "  .card.mb-3.h-100\n"
-    card_pug += "    .row.h-100.g-0\n"
-    card_pug += "      .col-md-3\n"
-    card_pug += "        .info\n"
+    card_pug = ""
+    # card_pug += ".col\n"
+    card_pug += ".card.mb-3\n"
+    card_pug += "  .row.g-0\n"
+    card_pug += "    .col-md-3\n"
+    card_pug += "      .info\n"
     for line in dt_pug.split("\n"):
-        card_pug += f"          {line}\n"
-    card_pug += "      .col-md-9\n"
-    card_pug += "        .card-body\n"
-    card_pug += "          h5.card-title\n"
-    card_pug += f"            | {title}\n"
+        card_pug += f"        {line}\n"
+    card_pug += "    .col-md-9\n"
+    card_pug += "      .card-body\n"
+    card_pug += "        h5.card-title\n"
+    card_pug += f"          | {title}\n"
     if subtitle:
-        card_pug += "          h6.card-subtitle.mb-2.text-body-secondary\n"
-        card_pug += f"            | {subtitle}\n"
+        card_pug += "        h6.card-subtitle.mb-2.text-body-secondary\n"
+        card_pug += f"          | {subtitle}\n"
     if abstract:
-        card_pug += "          p.card-text\n"
-        card_pug += f"            | {abstract}\n"
+        card_pug += "        p.card-text\n"
+        card_pug += f"          | {abstract}\n"
     return card_pug
 
 
