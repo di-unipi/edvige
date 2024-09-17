@@ -1,7 +1,46 @@
 .info {
   padding: var(--bs-card-spacer-y) var(--bs-card-spacer-x);
-  background-color: var(--bs-secondary);
+  background-color: #283542;
   /* Curvature of the border */
   border-radius: 0.25rem 0 0 0.25rem;
   height: 100%;
+}
+
+body {
+  background: linear-gradient(#1F2933, #303030, #1F2933 50%, #303030, #1F2933);
+  background-size: 100% 200%;
+  animation-iteration-count: 1;
+  animation-name: gradient;
+  animation-duration: 10s;
+  color: #E4E7EB;
+}
+
+.card-title {
+  font-weight: bold;
+  color: #FFAD44;
+}
+
+.day {
+  font-weight: bold;
+  margin-bottom: -0.2rem !important;
+}
+
+.month {
+  font-weight: bold;
+}
+
+.hashtag {
+  color: #FFAD44;
+}
+
+.location::before {
+  content: "“";
+}
+
+.location::after {
+  content: "“";
+}
+
+.card-footer {
+  text-align: right;
 }

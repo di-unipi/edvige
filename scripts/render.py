@@ -35,9 +35,9 @@ def render_date(start: dt, end: dt) -> str:
     end_time = end.strftime("%H:%M")
 
     # Compose and return the object
-    dt_pug = f"h3.mb-0 {day}\n"
+    dt_pug = f"h3.day.mb-0 {day}\n"
     dt_pug += f"h5.month.mb-0 {month}\n"
-    dt_pug += f"p.small {start_time}-{end_time}\n"
+    dt_pug += f"p {start_time}-{end_time}\n"
     return dt_pug
 
 
@@ -121,24 +121,27 @@ def render_card(talk: dict) -> str:
     card_pug += "      .info\n"
     for line in dt_pug.split("\n"):
         card_pug += f"        {line}\n"
-    if hashtags:
-        card_pug += "        p\n"
-        for hashtag in hashtags:
-            card_pug += "          | "
-            card_pug += f"#[span.badge.bg-primary.rounded-pill.mr-1]{render_hashtag(hashtag)}\n"
     card_pug += "    .col-md-9\n"
     card_pug += "      .card-body\n"
-    card_pug += "        h5.card-title\n"
+    card_pug += "        h4.card-title\n"
     card_pug += f"          | {title}\n"
     if subtitle:
-        card_pug += "        h6.card-subtitle.text-body-secondary\n"
+        card_pug += "        h5.card-subtitle.text-body-secondary\n"
         card_pug += f"          | {subtitle}\n"
     if location:
         card_pug += "        p.i.text-body-secondary\n"
         card_pug += f"          | {location}\n"
     if abstract:
-        card_pug += "        p.mt-1.card-text\n"
+        card_pug += "        p.mt-1.card-text.abstract\n"
         card_pug += f"          | {abstract}\n"
+    # if hashtags:
+    #     card_pug += "  .card-footer\n"
+    #     card_pug += "    p.mb-0\n"
+    #     for hashtag in hashtags:
+    #         card_pug += f"      span.hashtag {render_hashtag(hashtag)}\n"
+    # card_pug += "      |  in \n"
+    # if location:
+    #     card_pug += f"      span.location {location}\n"
     return card_pug
 
 
