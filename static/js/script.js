@@ -10,27 +10,36 @@
 // Get the height of the left column
 var left_column = document.getElementById('left');
 // var col_height = left_column.offsetHeight;
-var col_height = 1000;
+var col_height = 900;
 console.log('Left height: ' + col_height);
+
+// Initialize usage
+let used_left = 0;
+let used_center = 0;
+let used_right = 0;
 
 // Iterate over left column childs and remove them
 let cards = [];
 let heights = [];
-for (card of left_column.children) {
-    height = card.offsetHeight;
-    cards.push(card);
+for (elem of left_column.children) {
+    // Check if the element is a card
+    if (!elem.classList.contains('card')) {
+        height = elem.offsetHeight;
+        used_left += height;
+        continue;
+    }
+    height = elem.offsetHeight;
+    cards.push(elem);
     heights.push(height);
 }
 
 // Remove cards
 for (card of cards) {
+    if (!card.classList.contains('card')) {
+        continue;
+    }
     left_column.removeChild(card);
 }
-
-// Iterate over cards
-let used_left = 0;
-let used_center = 0;
-let used_right = 0;
 
 for (let i = 0; i < cards.length; i++) {
     // Get the card

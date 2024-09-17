@@ -13,15 +13,20 @@ html(lang="en",data-bs-theme="dark").h-100
     script(src="js/script.js", defer)
   body.d-flex.flex-column.h-100
     main.flex-shrink-0 
-      .container-fluid.mt-4.ml-4.mr-4.vh-100
+      .container-fluid.mt-4.ml-4.mr-4
         .row.g-4
           .col.h-100#left
+            //- .contacts
+            //-   p Dummy
             include events
           .col.h-100#center
           .col.h-100#right
-    //- footer.footer
-    //-   .container-fluid
-    //-     .row.text-body-secondary
-    //-       include footer
+    footer.footer.mt-auto.py-2.bg-body-tertiary.mb-0
+      .container-fluid
+        .row.text-body-secondary
+          .col-6
+              p.mb-0 Last Update: #{new Date().toLocaleDateString()} at #{new Date().toLocaleTimeString()}.
+          .col-6.text-end
+              p.mb-0 Made with ❤️ by 🦉
     </body>
 </html>
