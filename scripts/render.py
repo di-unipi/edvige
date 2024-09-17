@@ -20,7 +20,7 @@ def suffix(d: int) -> str:
     )
 
 
-def render_info(start: dt, end: dt, location: str) -> str:
+def render_date(start: dt, end: dt) -> str:
     """Renders the datetime object from the start and end time."""
     # Get cardinal day without leading zero
     day = str(int(start.strftime("%d")))
@@ -38,7 +38,6 @@ def render_info(start: dt, end: dt, location: str) -> str:
     dt_pug = f"h3.mb-0 {day}\n"
     dt_pug += f"h5.month.mb-0 {month}\n"
     dt_pug += f"p.small {start_time}-{end_time}\n"
-    dt_pug += f"p.small {location}"
     return dt_pug
 
 
@@ -52,60 +51,53 @@ def render_footer() -> str:
     return footer_pug
 
 
-def parse_title(title: str) -> tuple[str, str]:
+def parse_event_name(name: str) -> tuple[str, str, list[str]]:
     """Parse the title"""
     # Check if it matches [TYPE] Title (Speaker name, Institution)
     pattern = re.compile(
         r"\[(?P<type>.+)\] (?P<title>.+) \((?P<speaker>.+), (?P<institution>.+)\)"
     )
-    match = pattern.match(title)
+    match = pattern.match(name)
     if match:
         title = match.group("title")
         subtitle = f'{match.group("speaker")}, {match.group("institution")}'
         hashtags = match.group("type").split(",")
-        hashtags = [
-            f'<span class="hashtag">#{h.strip()}</span>' for h in hashtags
-        ]
-        subtitle += '<div class="hashtags">' + " ".join(hashtags) + "</div>"
-        return title, subtitle
+        return title, subtitle, hashtags
 
     # Try then to match [TYPE] Title (Speaker name)
     pattern = re.compile(r"\[(?P<type>.+)\] (?P<title>.+) \((?P<speaker>.+)\)")
-    match = pattern.match(title)
+    match = pattern.match(name)
     if match:
         title = match.group("title")
         subtitle = f'{match.group("speaker")}'
         hashtags = match.group("type").split(",")
-        hashtags = [
-            f'<span class="hashtag">#{h.strip()}</span>' for h in hashtags
-        ]
-        subtitle += '<div class="hashtags">' + " ".join(hashtags) + "</div>"
-        return title, subtitle
+        return title, subtitle, hashtags
 
     # Try then to match [TYPE] Title
     pattern = re.compile(r"\[(?P<type>.+)\] (?P<title>.+)")
-    match = pattern.match(title)
+    match = pattern.match(name)
     if match:
         title = match.group("title")
         subtitle = ""
         hashtags = match.group("type").split(",")
-        hashtags = [
-            f'<span class="hashtag">#{h.strip()}</span>' for h in hashtags
-        ]
-        subtitle += '<div class="hashtags">' + " ".join(hashtags) + "</div>"
-        return title, subtitle
+        return title, subtitle, hashtags
 
-    return title, ""
+    return title, "", []
+
+
+def render_hashtag(hashtag: str) -> str:
+    return hashtag
 
 
 def render_card(talk: dict) -> str:
     """Renders the card"""
 
     # Parse title
-    title, subtitle = parse_title(talk["Titolo"])
+    title, subtitle, hashtags = parse_event_name(talk["Titolo"])
 
     # Get the datetime object
-    dt_pug = render_info(talk["Inizio"], talk["Fine"], talk["Luogo"])
+    dt_pug = render_date(talk["Inizio"], talk["Fine"])
+    location = talk["Luogo"]
 
     # Get the abstract
     abstract = talk["Abstract"]
@@ -129,15 +121,23 @@ def render_card(talk: dict) -> str:
     card_pug += "      .info\n"
     for line in dt_pug.split("\n"):
         card_pug += f"        {line}\n"
+    if hashtags:
+        card_pug += "        p\n"
+        for hashtag in hashtags:
+            card_pug += "          | "
+            card_pug += f"#[span.badge.bg-primary.rounded-pill.mr-1]{render_hashtag(hashtag)}\n"
     card_pug += "    .col-md-9\n"
     card_pug += "      .card-body\n"
     card_pug += "        h5.card-title\n"
     card_pug += f"          | {title}\n"
     if subtitle:
-        card_pug += "        h6.card-subtitle.mb-2.text-body-secondary\n"
+        card_pug += "        h6.card-subtitle.text-body-secondary\n"
         card_pug += f"          | {subtitle}\n"
+    if location:
+        card_pug += "        p.i.text-body-secondary\n"
+        card_pug += f"          | {location}\n"
     if abstract:
-        card_pug += "        p.card-text\n"
+        card_pug += "        p.mt-1.card-text\n"
         card_pug += f"          | {abstract}\n"
     return card_pug
 
