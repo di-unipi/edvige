@@ -82,6 +82,19 @@ def parse_title(title: str) -> tuple[str, str]:
         subtitle += '<div class="hashtags">' + " ".join(hashtags) + "</div>"
         return title, subtitle
 
+    # Try then to match [TYPE] Title
+    pattern = re.compile(r"\[(?P<type>.+)\] (?P<title>.+)")
+    match = pattern.match(title)
+    if match:
+        title = match.group("title")
+        subtitle = ""
+        hashtags = match.group("type").split(",")
+        hashtags = [
+            f'<span class="hashtag">#{h.strip()}</span>' for h in hashtags
+        ]
+        subtitle += '<div class="hashtags">' + " ".join(hashtags) + "</div>"
+        return title, subtitle
+
     return title, ""
 
 
