@@ -106,8 +106,10 @@ def render_card(talk: dict) -> str:
         soup = BeautifulSoup(abstract, features="lxml")
         # Get text
         abstract = soup.get_text(strip=False)
-        # Keep only first 500 characters
-        abstract = abstract[:600] + "..."
+        # Keep only first 600 characters
+        abstract = abstract[:600]
+        abstract = abstract.rsplit(" ", 1)[0]
+        abstract = abstract + "..."
         # Split by lines
         lines = abstract.split("\n")
         abstract = "#[br] \n          | ".join(lines)
