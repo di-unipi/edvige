@@ -89,11 +89,14 @@ def render_hashtag(hashtag: str) -> str:
     return hashtag
 
 
-def render_card(talk: dict) -> str:
+def render_card(talk: dict, now: dt) -> str:
     """Renders the card"""
 
     # Parse title
     title, subtitle, hashtags = parse_event_name(talk["Titolo"])
+
+    # Check if the event is live
+    is_live = talk["Inizio"] < now < talk["Fine"]
 
     # Get the datetime object
     dt_pug = render_date(talk["Inizio"], talk["Fine"])
@@ -123,6 +126,11 @@ def render_card(talk: dict) -> str:
     card_pug += "      .info\n"
     for line in dt_pug.split("\n"):
         card_pug += f"        {line}\n"
+    if is_live:
+        card_pug += "        h4\n"
+        card_pug += "          span.badge.bg-danger\n"
+        card_pug += "            i.live-icon.bi.bi-broadcast\n"
+        card_pug += "            span  LIVE\n"
     card_pug += "    .col-md-9\n"
     card_pug += "      .card-body\n"
     card_pug += "        h4.card-title\n"
@@ -193,7 +201,7 @@ def main(
     with open("layout/events.pug", "w", encoding="utf-8") as f:
         if future:
             for talk in future[:number]:
-                f.write(render_card(talk))
+                f.write(render_card(talk, now))
                 print(f'[{now}] Wrote {talk["Titolo"]} {talk["Inizio"]}')
 
     # Render footer

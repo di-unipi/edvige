@@ -44,3 +44,13 @@ body {
 .card-footer {
   text-align: right;
 }
+
+.live-icon {
+  animation: blinker 1.5s step-start infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
