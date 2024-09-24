@@ -64,3 +64,13 @@ body {
 .text-large {
     font-size: 110%;
 }
+
+.past-event {
+    opacity: 0.4;
+}
+
+.bi {
+    display: inline-block;
+    vertical-align: 0.095em;
+    fill: currentcolor;
+}

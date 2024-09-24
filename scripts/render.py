@@ -89,7 +89,7 @@ def render_hashtag(hashtag: str) -> str:
     return hashtag
 
 
-def render_card(talk: dict, now: dt) -> str:
+def render_card(talk: dict, now: dt, past_event: bool = False) -> str:
     """Renders the card"""
 
     # Parse title
@@ -120,7 +120,10 @@ def render_card(talk: dict, now: dt) -> str:
     # Compose the card
     card_pug = ""
     # card_pug += ".col\n"
-    card_pug += ".card.mb-3\n"
+    if past_event:
+        card_pug += ".card.mb-3.past-event\n"
+    else:
+        card_pug += ".card.mb-3\n"
     card_pug += "  .row.g-0\n"
     card_pug += "    .col-md-3\n"
     card_pug += "      .info\n"
@@ -131,6 +134,11 @@ def render_card(talk: dict, now: dt) -> str:
         card_pug += "          span.badge.bg-danger\n"
         card_pug += "            i.live-icon.bi.bi-broadcast\n"
         card_pug += "            span  LIVE\n"
+    if past_event:
+        card_pug += "        h5\n"
+        card_pug += "          span.badge.bg-warning\n"
+        card_pug += "            i.bi.bi-hourglass-bottom\n"
+        card_pug += "            |  Ended!\n"
     card_pug += "    .col-md-9\n"
     card_pug += "      .card-body\n"
     card_pug += "        h4.card-title\n"
@@ -156,7 +164,7 @@ def render_card(talk: dict, now: dt) -> str:
 
 
 def main(
-    csv_filename: str, date: Optional[str] = None, number: Optional[int] = 9
+    csv_filename: str, date: Optional[str] = None, number: Optional[int] = 15
 ):
     """Main"""
     talks = []
@@ -188,21 +196,33 @@ def main(
     # Filter talks
     talks = [talk for talk in talks if talk["Titolo"]]
     future = [talk for talk in talks if talk["Fine"] > now]
+    past = [talk for talk in talks if talk["Fine"] <= now]
 
     # Get the number of events to render
     if number is None:
         number = len(future)
 
+    # Select cards to render (future and past in reverse order)
+    cards = future[:number]
+    past_number = max(number - len(cards), 0)
+    cards = cards + list(reversed(past))[:past_number]
+
     # Log future events
     for t in future:
-        print(f'[{now}] Read {t["Titolo"]} {t["Inizio"]}')
+        print(f'[{now}] Future {t["Titolo"]} {t["Inizio"]}')
+    # Log past events
+    for t in past:
+        print(f'[{now}] Past {t["Titolo"]} {t["Inizio"]}')
 
-    # Render future events
+    # Render events
     with open("layout/events.pug", "w", encoding="utf-8") as f:
-        if future:
-            for talk in future[:number]:
+        for talk in cards:
+            if talk in future:
                 f.write(render_card(talk, now))
-                print(f'[{now}] Wrote {talk["Titolo"]} {talk["Inizio"]}')
+            else:
+                assert talk in past
+                f.write(render_card(talk, now, past_event=True))
+            print(f'[{now}] Wrote {talk["Titolo"]} {talk["Inizio"]}')
 
     # Render footer
     with open("layout/footer.pug", "w", encoding="utf-8") as f:
