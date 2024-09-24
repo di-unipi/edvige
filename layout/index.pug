@@ -13,12 +13,32 @@ html(lang="en",data-bs-theme="dark").h-100
     link(href="css/style.css",rel="stylesheet")
     script(src="js/script.js", defer)
   body.d-flex.flex-column.h-100
-    main.flex-shrink-0 
+    main.flex-shrink-0
       .container-fluid.mt-4.ml-4.mr-4
         .row.g-4
           .col.h-100#left
             //- .contacts
             //-   p Dummy
+            .card.mb-3
+                .card-body
+                    .h4.card-title Hey there! 🦉
+                    .row.gx-5.mt-3
+                        .col-md-7
+                            p.text-large
+                                strong Edvige
+                                | 's here to help you
+                                | keep track of the events you care about.
+                            p.text-large
+                                | Just scan the QR code to add it
+                                | to your Google Calendar.
+                            p
+                                | Something's not working?
+                                | #[br]
+                                | Drop us a line at
+                                |
+                                a(href="mailto:comunicazione@di.unipi.it") comunicazione@di.unipi.it
+                        .col-md-5
+                            img(src='assets/qr.png',width='85%').rounded.mt-0.mb-0
             include events
           .col.h-100#center
           .col.h-100#right
