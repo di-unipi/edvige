@@ -82,7 +82,7 @@ def parse_event_name(name: str) -> tuple[str, str, list[str]]:
         hashtags = match.group("type").split(",")
         return title, subtitle, hashtags
 
-    return title, "", []
+    return name, "", []
 
 
 def render_hashtag(hashtag: str) -> str:
