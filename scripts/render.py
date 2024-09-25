@@ -45,9 +45,9 @@ def render_footer() -> str:
     """Renders the footer"""
     now = dt.now().astimezone()
     footer_pug = ".col-6\n"
-    footer_pug += f"    p Last update: {now.strftime('%d/%m/%Y')} at {now.strftime('%H:%M')}\n"
+    footer_pug += f"    p.mb-0 Last update: {now.strftime('%d/%m/%Y')} at {now.strftime('%H:%M')}\n"
     footer_pug += ".col-6.text-end\n"
-    footer_pug += "    p Made with ❤️ by 🦉\n"
+    footer_pug += "    p.mb-0 Made with ❤️ by the Department's Communication Team\n"
     return footer_pug
 
 

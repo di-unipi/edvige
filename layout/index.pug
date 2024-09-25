@@ -45,9 +45,4 @@ html(lang="en",data-bs-theme="dark").h-100
     footer.footer.mt-auto.py-2.bg-body-tertiary.mb-0
       .container-fluid
         .row.text-body-secondary
-          .col-6
-              p.mb-0 Last Update: #{new Date().toLocaleDateString()} at #{new Date().toLocaleTimeString()}.
-          .col-6.text-end
-              p.mb-0
-                | Made with ❤️ by the
-                | Department's Communication Team
+            include footer
