@@ -10,7 +10,7 @@
 // Get the height of the left column
 var left_column = document.getElementById('left');
 // var col_height = left_column.offsetHeight;
-var col_height = 900;
+var col_height = 1000;
 console.log('Left height: ' + col_height);
 
 // Initialize usage
