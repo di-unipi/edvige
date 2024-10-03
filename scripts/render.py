@@ -2,6 +2,7 @@
 Render in Pug format the next talks
 """
 
+import math
 import re
 from datetime import datetime as dt
 from typing import Optional
@@ -109,13 +110,40 @@ def render_card(talk: dict, now: dt, past_event: bool = False) -> str:
         soup = BeautifulSoup(abstract, features="lxml")
         # Get text
         abstract = soup.get_text(strip=False)
-        # Keep only first 600 characters
-        abstract = abstract[:600]
-        abstract = abstract.rsplit(" ", 1)[0]
-        abstract = abstract + "..."
         # Split by lines
         lines = abstract.split("\n")
-        abstract = "#[br] \n          | ".join(lines)
+
+        # Keep only the first 6 lines, we consider
+        # an average of 60 chars per line.
+        max_lines = 10
+        avg_chars = 58
+        curr_line = 0
+        render_lines = []
+        ellipsis = False
+
+        for line in lines:
+            char_budget = avg_chars * (max_lines - curr_line)
+            content = line[:char_budget]
+            if len(line) > char_budget:
+                content = content.rsplit(" ", 1)[0]
+                content = content + "..."
+                ellipsis = True
+            content_lines = math.ceil(len(content) / avg_chars)
+            curr_line += max(1, content_lines)
+            render_lines.append(content)
+            if curr_line >= max_lines:
+                break
+
+        if not ellipsis and len(lines) > len(render_lines):
+            last_line = render_lines.pop()
+            while len(last_line) == 0:
+                last_line = render_lines.pop()
+            # Remove trailing spaces
+            last_line = last_line.rstrip()
+            last_line = last_line + " (...)"
+            render_lines.append(last_line)
+
+        abstract = "#[br] \n          | ".join(render_lines)
 
     # Compose the card
     card_pug = ""
@@ -141,7 +169,7 @@ def render_card(talk: dict, now: dt, past_event: bool = False) -> str:
         card_pug += "            |  Ended!\n"
     card_pug += "    .col-md-9\n"
     card_pug += "      .card-body\n"
-    card_pug += "        h4.card-title\n"
+    card_pug += "        h3.card-title\n"
     card_pug += f"          | {title}\n"
     if subtitle:
         card_pug += "        h5.card-subtitle.text-body-secondary\n"
