@@ -149,9 +149,9 @@ def render_card(talk: dict, now: dt, past_event: bool = False) -> str:
     card_pug = ""
     # card_pug += ".col\n"
     if past_event:
-        card_pug += ".card.mb-3.past-event\n"
+        card_pug += ".card.mb-3.past-event.invisible\n"
     else:
-        card_pug += ".card.mb-3\n"
+        card_pug += ".card.mb-3.invisible\n"
     card_pug += "  .row.g-0\n"
     card_pug += "    .col-md-3\n"
     card_pug += "      .info\n"
