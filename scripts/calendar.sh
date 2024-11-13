@@ -1,5 +1,5 @@
 #! /bin/bash
-set -e 
+set -e
 
 # Log
 mkdir -p logs/
@@ -20,6 +20,7 @@ rm -f layout/events.pug
 rm -f basic.ics
 
 # Move to folder
+mkdir -p www
 cp -r static/* www/
 mv index.html www/index.html
 
