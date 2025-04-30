@@ -1,5 +1,5 @@
 #! /bin/bash
-set -e 
+set -e
 
 # Log
 mkdir -p logs/
@@ -16,13 +16,12 @@ node_modules/.bin/pug --doctype html --pretty layout/index.pug --out .
 
 # Remove temporary pug files
 rm -f layout/footer.pug
-rm -f layout/next.pug
-rm -f layout/upcoming.pug
+rm -f layout/events.pug
 rm -f basic.ics
 
 # Move to folder
-rm -r www/
-cp -r static www/
+mkdir -p www
+cp -r static/* www/
 mv index.html www/index.html
 
 echo "End $(date)" >> logs/calendar.log

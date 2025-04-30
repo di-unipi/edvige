@@ -60,3 +60,10 @@ Cronjob
 30 8  * * 1-5 export DISPLAY=":0.0"; xrandr --output HDMI-1 --auto
 40 18 * * 1-5 export DISPLAY=":0.0"; xrandr --output HDMI-1 --off
 ```
+
+## Docker / Podman
+
+```bash
+podman build -t edvige .
+podman run -p 8080:8080 edvige
+```
