@@ -1,0 +1,74 @@
+---
+layout: null
+---
+
+{% include head.html %}
+
+<body class="d-flex flex-column h-100">
+    <main class="flex-shrink-0">
+        <div class="container-fluid mt-4 ml-4 mr-4">
+            <div class="row g-4">
+                <!-- Colonna sinistra -->
+                <div class="col h-100" id="left">
+                    <!-- Card di benvenuto -->
+                    <div class="card mb-3 special-card">
+                        <div class="card-body">
+                            <div class="h4 card-title">Hey there! 🦉</div>
+                            <div class="row gx-5 mt-3">
+                                <div class="col-md-7">
+                                    <p class="text-large">
+                                        <strong>Edvige</strong>'s here to help you keep track of the events you care
+                                        about.
+                                    </p>
+                                    <p class="text-large">
+                                        Just scan the QR code to add it to your Google Calendar.
+                                    </p>
+                                    <p>
+                                        Something's not working?<br />
+                                        Drop us a line at
+                                        <a href="mailto:comunicazione@di.unipi.it">comunicazione@di.unipi.it</a>
+                                    </p>
+                                </div>
+                                <div class="col-md-5 d-flex justify-content-center align-items-center">
+                                    <img src="/assets/qr.png" width="80%" class="rounded mt-0 mb-0"
+                                        alt="Edvige QR Code" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Qui inseriamo gli eventi generati da Python -->
+                    {% for event in site.data.events %}
+                    {% include event.html event=event %}
+                    {% endfor %}
+                </div>
+
+                <!-- Colonna centrale e destra: riempite via JS -->
+                <div class="col h-100" id="center"></div>
+                <div class="col h-100" id="right">
+
+                    {% assign locandina = nil %}
+                    {% for f in site.static_files %}
+                    {% if f.path contains "/assets/" %}
+                    {% if f.path contains site.poster_name %}
+                    {% assign locandina = f %}
+                    {% endif %}
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if locandina %}
+                    <div class="card mb-3 special-card">
+                        <div class="card-body">
+                            <img src="{{ locandina.path }}" width="100%" class="rounded mt-0 mb-0" />
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    {% include footer.html %}
+</body>
+
+</html>

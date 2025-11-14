@@ -1,5 +1,5 @@
-requests
 icalendar
 beautifulsoup4
-lxml
+requests
 fire
+pyyaml

@@ -1,0 +1,65 @@
+<div class="card mb-3{% if include.event.past %} past-event{% endif %} invisible">
+    <div class="row g-0">
+        <!-- Colonna sinistra: data, orario, badge, hashtag -->
+        <div class="col-md-3">
+            <div class="info">
+                <h3 class="day mb-0">{{ include.event.day }}</h3>
+                <h5 class="month mb-0">{{ include.event.month }}</h5>
+                <p>{{ include.event.time }}</p>
+
+                {% if include.event.live %}
+                <h4>
+                    <span class="badge bg-danger">
+                        <i class="live-icon bi bi-broadcast"></i>
+                        <span> LIVE</span>
+                    </span>
+                </h4>
+                {% endif %}
+
+                {% if include.event.past %}
+                <h5>
+                    <span class="badge bg-warning">
+                        <i class="bi bi-hourglass-bottom"></i>
+                        Ended!
+                    </span>
+                </h5>
+                {% endif %}
+
+                {% if include.event.hashtags %}
+                <div class="hashtags mt-3 pt-3 text-muted small">
+                    {% for tag in include.event.hashtags %}
+                    <span class="hashtag">[{{ tag }}]</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Colonna destra: titolo, sottotitolo, luogo, abstract -->
+        <div class="col-md-9">
+            <div class="card-body">
+                <h3 class="card-title">
+                    {{ include.event.title }}
+                </h3>
+
+                {% if include.event.subtitle %}
+                <h5 class="card-subtitle text-body-secondary">
+                    {{ include.event.subtitle }}
+                </h5>
+                {% endif %}
+
+                {% if include.event.location %}
+                <p class="i text-body-secondary">
+                    {{ include.event.location }}
+                </p>
+                {% endif %}
+
+                {% if include.event.abstract_html %}
+                <p class="mt-1 card-text abstract">
+                    {{ include.event.abstract_html | raw }}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
