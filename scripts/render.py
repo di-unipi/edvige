@@ -14,11 +14,7 @@ from icalendar import Calendar  # type: ignore
 
 def suffix(d: int) -> str:
     """Returns the correct suffix for a given day of the month."""
-    return (
-        "th"
-        if 11 <= d <= 13
-        else {1: "st", 2: "nd", 3: "rd"}.get(d % 10, "th")
-    )
+    return "th" if 11 <= d <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(d % 10, "th")
 
 
 def render_date(start: dt, end: dt) -> str:
@@ -147,16 +143,21 @@ def render_card(talk: dict, now: dt, past_event: bool = False) -> str:
 
     # Compose the card
     card_pug = ""
-    # card_pug += ".col\n"
     if past_event:
         card_pug += ".card.mb-3.past-event.invisible\n"
     else:
         card_pug += ".card.mb-3.invisible\n"
+
     card_pug += "  .row.g-0\n"
     card_pug += "    .col-md-3\n"
+    # card_pug += "    .col-md-3.d-flex.flex-column.justify-content-between\n"
     card_pug += "      .info\n"
+
+    # Date and time
     for line in dt_pug.split("\n"):
         card_pug += f"        {line}\n"
+
+    # Badge for live/ended event
     if is_live:
         card_pug += "        h4\n"
         card_pug += "          span.badge.bg-danger\n"
@@ -167,10 +168,19 @@ def render_card(talk: dict, now: dt, past_event: bool = False) -> str:
         card_pug += "          span.badge.bg-warning\n"
         card_pug += "            i.bi.bi-hourglass-bottom\n"
         card_pug += "            |  Ended!\n"
+
+    # Hashtags
+    if hashtags:
+        card_pug += "        .hashtags.mt-3.pt-3.text-muted.small\n"
+        for hashtag in hashtags:
+            card_pug += f"          span.hashtag [{render_hashtag(hashtag)}]\n"
+
+    # Main content
     card_pug += "    .col-md-9\n"
     card_pug += "      .card-body\n"
     card_pug += "        h3.card-title\n"
     card_pug += f"          | {title}\n"
+
     if subtitle:
         card_pug += "        h5.card-subtitle.text-body-secondary\n"
         card_pug += f"          | {subtitle}\n"
@@ -185,15 +195,10 @@ def render_card(talk: dict, now: dt, past_event: bool = False) -> str:
     #     card_pug += "    p.mb-0\n"
     #     for hashtag in hashtags:
     #         card_pug += f"      span.hashtag {render_hashtag(hashtag)}\n"
-    # card_pug += "      |  in \n"
-    # if location:
-    #     card_pug += f"      span.location {location}\n"
     return card_pug
 
 
-def main(
-    csv_filename: str, date: Optional[str] = None, number: Optional[int] = 15
-):
+def main(csv_filename: str, date: Optional[str] = None, number: Optional[int] = 15):
     """Main"""
     talks = []
     with open(csv_filename, "rb") as fp:
