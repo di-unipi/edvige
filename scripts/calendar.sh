@@ -11,8 +11,13 @@ python3 scripts/downloader.py basic.ics >> logs/calendar.log
 # Render the pug files
 python3 scripts/render.py basic.ics >> logs/calendar.log
 
-# Pug rendering
-node_modules/.bin/pug --doctype html --pretty layout/index.pug --out .
+# Check if static/assets/locandina.png exists
+if [ -f static/assets/locandina.png ]; then
+    node_modules/.bin/pug --doctype html --pretty layout/index_locandina.pug --out .
+    mv index_locandina.html index.html
+else
+    node_modules/.bin/pug --doctype html --pretty layout/index.pug --out .
+fi
 
 # Remove temporary pug files
 rm -f layout/footer.pug
