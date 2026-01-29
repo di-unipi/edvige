@@ -1,9 +1,7 @@
-<<<<<<< HEAD
 logs/
 node_modules/
 www/
 static/assets/locandina.png
-=======
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -220,4 +218,3 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
->>>>>>> 7b5ff40be15d78cc97c75aad7da30440b47d9b80

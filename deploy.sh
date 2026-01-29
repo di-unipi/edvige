@@ -1,7 +1,7 @@
 # deploy on edvige
 rsync -avz --delete \
 	--exclude ".*" \
-       	--exclude ".git*" \
+	--exclude ".git*" \
 	--exclude "node_modules/" \
 	--exclude "www/" \
 	--exclude "deploy.sh" \

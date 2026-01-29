@@ -52,7 +52,7 @@ that
 2. Renders the webpage and its dependecies in the `www` folder
 
 
-Cronjob
+Cronjob (given the username `pi`)
 
 ```
 */5 9-18 * * 1-5 cd /home/pi/edvige && bash scripts/calendar.sh && bash scripts/refresh_firefox.sh
@@ -65,5 +65,5 @@ Cronjob
 
 ```bash
 podman build -t edvige .
-podman run -p 8080:8080 edvige
+bash scripts/calendar_podman.sh
 ```

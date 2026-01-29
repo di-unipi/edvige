@@ -22,17 +22,5 @@ COPY requirements.txt .
 RUN npm ci && \
     pip3 install -r requirements.txt
 
-# Install a web server
-RUN npm install -g http-server
-
-# Copy the whole project to the container
-COPY . .
-
-# Run the script to generate static content
-RUN npm run calendar
-
-# Serve the www directory
-EXPOSE 8080
-
-# Start the web server
-CMD ["http-server", "./www"]
+# Run npm run calendar when the container starts
+CMD ["npm", "run", "calendar"]
