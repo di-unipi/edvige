@@ -4,6 +4,10 @@ FROM node:17.9.0-bullseye
 # Set environment variables to avoid user input prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Set container to have Europe/Rome timezone
+RUN ln -sf /usr/share/zoneinfo/Europe/Rome /etc/localtime && \
+    echo "Europe/Rome" > /etc/timezone
+
 # Update the package list and install prerequisites
 RUN apt-get update && \
     apt-get install -y curl software-properties-common build-essential
