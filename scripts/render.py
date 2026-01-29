@@ -240,13 +240,6 @@ def main(csv_filename: str, date: Optional[str] = None, number: Optional[int] = 
     past_number = max(number - len(cards), 0)
     cards = cards + list(reversed(past))[:past_number]
 
-    # Log future events
-    for t in future:
-        print(f'[{now}] Future {t["Titolo"]} {t["Inizio"]}')
-    # Log past events
-    for t in past:
-        print(f'[{now}] Past {t["Titolo"]} {t["Inizio"]}')
-
     # Render events
     with open("layout/events.pug", "w", encoding="utf-8") as f:
         for talk in cards:
@@ -255,12 +248,13 @@ def main(csv_filename: str, date: Optional[str] = None, number: Optional[int] = 
             else:
                 assert talk in past
                 f.write(render_card(talk, now, past_event=True))
-            print(f'[{now}] Wrote {talk["Titolo"]} {talk["Inizio"]}')
 
     # Render footer
     with open("layout/footer.pug", "w", encoding="utf-8") as f:
         footer = render_footer()
         f.write(footer)
+
+    print(f"Rendered {len(cards)} events.")
 
 
 if __name__ == "__main__":
