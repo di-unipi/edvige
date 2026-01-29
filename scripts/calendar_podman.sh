@@ -7,7 +7,7 @@
 # - ./www to /home/edvige/www
 mkdir -p logs
 mkdir -p www
-podman run \
+podman run --rm \
   -v "$(pwd)/layout":/edvige/layout:Z \
   -v "$(pwd)/logs":/edvige/logs:Z \
   -v "$(pwd)/scripts":/edvige/scripts:Z \
