@@ -21,7 +21,7 @@ bash scripts/calendar_podman.sh
 
 ## Workflow
 
-This repository is downloaded on a Raspberry Pi 3B that renders and serves the web page. Every five minutes, a cronjob runs the `calendar_podman.sh`. We do **not** handle automatic refreshing of the website, which should be done by an extension/plugin of your choice in the browser.
+This repository is downloaded on a Raspberry Pi 3B that renders and serves the web page. Every five minutes, a cronjob runs the `calendar_podman.sh`. The page automatically refreshes every 60 seconds via the `autorefresh.js` script.
 
 Other scripts used by the cronjob are:
 - `monitor.sh` to turn on and off the TV screen at specific times, and
