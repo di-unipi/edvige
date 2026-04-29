@@ -4,12 +4,22 @@ Render in Pug format the next talks
 
 import math
 import re
-from datetime import datetime as dt
+from datetime import datetime as dt, date as d, time
 from typing import Optional
 
 import fire  # type: ignore
 from bs4 import BeautifulSoup  # type: ignore
 from icalendar import Calendar  # type: ignore
+
+def as_datetime(value):
+    """Convert icalendar date/datetime values to timezone-aware datetime."""
+    if isinstance(value, dt):
+        return value.astimezone()
+
+    if isinstance(value, d):
+        return dt.combine(value, time.min).astimezone()
+
+    raise TypeError(f"Unsupported date type: {type(value)}")
 
 
 def suffix(d: int) -> str:
@@ -210,8 +220,8 @@ def main(csv_filename: str, date: Optional[str] = None, number: Optional[int] = 
                 talks.append(
                     {
                         "Titolo": component.get("summary"),
-                        "Inizio": component.get("dtstart").dt.astimezone(),
-                        "Fine": component.get("dtend").dt.astimezone(),
+                        "Inizio": as_datetime(component.get("dtstart").dt),
+                        "Fine": as_datetime(component.get("dtend").dt),
                         "Luogo": component.get("location"),
                         "Abstract": component.get("description"),
                     }
