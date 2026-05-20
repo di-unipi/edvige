@@ -1,0 +1,129 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Debug Events//Parse Event Name Cases//IT
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Debug parse_event_name cases
+X-WR-TIMEZONE:Europe/Rome
+
+BEGIN:VEVENT
+UID:debug-001-authors-full@example.test
+DTSTAMP:20260520T100000Z
+DTSTART;TZID=Europe/Rome:20260601T100000
+DTEND;TZID=Europe/Rome:20260601T110000
+SUMMARY:[SEMINAR] Multiple authors with institutions (Alice Rossi, University of Rome; Bob Bianchi, INFN; Carol Verdi, CNR)
+LOCATION:Room A
+DESCRIPTION:<p>Case 1: multiple authors, each with institution.</p>\n<p>This abstract is intentionally short.</p>
+END:VEVENT
+
+BEGIN:VEVENT
+UID:debug-002-mixed-authors@example.test
+DTSTAMP:20260520T100000Z
+DTSTART;TZID=Europe/Rome:20260602T140000
+DTEND;TZID=Europe/Rome:20260602T153000
+SUMMARY:[COLLOQUIUM, Physics] Mixed authors with and without institutions (Daniele Neri, University of Pisa; Elena Gallo; Fabio Conti, SISSA; Giulia Ferri)
+LOCATION:Main Auditorium
+DESCRIPTION:<p>Case 2: mixed authors. Some have an institution, some do not.</p>\n<p>This is useful to verify semicolon splitting.</p>
+END:VEVENT
+
+BEGIN:VEVENT
+UID:debug-003-single-author-inst@example.test
+DTSTAMP:20260520T100000Z
+DTSTART;TZID=Europe/Rome:20260603T090000
+DTEND;TZID=Europe/Rome:20260603T100000
+SUMMARY:[WORKSHOP] Single author with institution (Hannah Smith, University of Oxford)
+LOCATION:Lab 3
+DESCRIPTION:<p>Case 3: old supported format with one author and one institution.</p>
+END:VEVENT
+
+BEGIN:VEVENT
+UID:debug-004-single-author-no-inst@example.test
+DTSTAMP:20260520T100000Z
+DTSTART;TZID=Europe/Rome:20260604T120000
+DTEND;TZID=Europe/Rome:20260604T130000
+SUMMARY:[LECTURE] Single author without institution (Ivan Brown)
+LOCATION:Room B
+DESCRIPTION:<p>Case 4: old supported format with one author and no institution.</p>
+END:VEVENT
+
+BEGIN:VEVENT
+UID:debug-005-no-authors@example.test
+DTSTAMP:20260520T100000Z
+DTSTART;TZID=Europe/Rome:20260605T160000
+DTEND;TZID=Europe/Rome:20260605T170000
+SUMMARY:[MEETING, Internal] Event with tags but no authors
+LOCATION:Online
+DESCRIPTION:<p>Case 5: tags and title only. Subtitle should be empty.</p>
+END:VEVENT
+
+BEGIN:VEVENT
+UID:debug-006-spaces-tags@example.test
+DTSTAMP:20260520T100000Z
+DTSTART;TZID=Europe/Rome:20260606T100000
+DTEND;TZID=Europe/Rome:20260606T113000
+SUMMARY:[Seminar, Quantum Computing, Machine Learning] Tags with spaces (Laura Riva, Politecnico di Milano; Marco Sala)
+LOCATION:Room C
+DESCRIPTION:<p>Case 6: tags with spaces. They should be normalized by _split_tags.</p>
+END:VEVENT
+
+BEGIN:VEVENT
+UID:debug-007-long-title@example.test
+DTSTAMP:20260520T100000Z
+DTSTART;TZID=Europe/Rome:20260607T150000
+DTEND;TZID=Europe/Rome:20260607T163000
+SUMMARY:[TALK] A longer title: parsing should keep punctuation, commas, and colons in the title (Nora Klein, ETH Zurich; Oscar Lee, MIT)
+LOCATION:Conference Room
+DESCRIPTION:<p>Case 7: title contains punctuation and commas.</p>\n<p>The parser should still detect only the final parenthesized author section.</p>
+END:VEVENT
+
+BEGIN:VEVENT
+UID:debug-008-empty-author-fragment@example.test
+DTSTAMP:20260520T100000Z
+DTSTART;TZID=Europe/Rome:20260608T110000
+DTEND;TZID=Europe/Rome:20260608T120000
+SUMMARY:[EDGECASE] Empty fragments between semicolons (Paolo Ricci, University of Bologna; ; Sara Moretti; Tommaso Villa, University of Trento)
+LOCATION:Room D
+DESCRIPTION:<p>Case 8: includes an empty author fragment between two semicolons. It should be ignored.</p>
+END:VEVENT
+
+BEGIN:VEVENT
+UID:debug-009-author-comma-empty-inst@example.test
+DTSTAMP:20260520T100000Z
+DTSTART;TZID=Europe/Rome:20260609T110000
+DTEND;TZID=Europe/Rome:20260609T120000
+SUMMARY:[EDGECASE] Author with trailing comma but no institution (Umberto Costa, ; Valeria Mancini, University of Padua)
+LOCATION:Room E
+DESCRIPTION:<p>Case 9: first author has an empty institution after comma. It should render as just the author name.</p>
+END:VEVENT
+
+BEGIN:VEVENT
+UID:debug-010-no-tags-fallback@example.test
+DTSTAMP:20260520T100000Z
+DTSTART;TZID=Europe/Rome:20260610T100000
+DTEND;TZID=Europe/Rome:20260610T110000
+SUMMARY:Raw event without tags should fall back unchanged
+LOCATION:Room F
+DESCRIPTION:<p>Case 10: fallback. No [TAGS] prefix.</p>
+END:VEVENT
+
+BEGIN:VEVENT
+UID:debug-011-past-event@example.test
+DTSTAMP:20260520T100000Z
+DTSTART;TZID=Europe/Rome:20260110T100000
+DTEND;TZID=Europe/Rome:20260110T110000
+SUMMARY:[PAST] Past event for ended rendering (Zoe Adams, University of Cambridge)
+LOCATION:Old Room
+DESCRIPTION:<p>Case 11: past event. Useful if you run the renderer with a date after this event.</p>
+END:VEVENT
+
+BEGIN:VEVENT
+UID:debug-012-long-abstract@example.test
+DTSTAMP:20260520T100000Z
+DTSTART;TZID=Europe/Rome:20260611T100000
+DTEND;TZID=Europe/Rome:20260611T113000
+SUMMARY:[ABSTRACT] Event with a long abstract (Anna Long, University of Turin; Bruno Text)
+LOCATION:Room G
+DESCRIPTION:<p>This is a deliberately long abstract used to test truncation in the Pug renderer.</p>\n<p>Line two contains enough text to be split across multiple visual lines in the generated card and should contribute to the line budget.</p>\n<p>Line three continues with more text about the event, the speakers, the topic, and the expected audience.</p>\n<p>Line four is here to make sure the renderer eventually appends an ellipsis or the parenthesized continuation marker when needed.</p>\n<p>Line five should probably not be fully visible depending on the current max_lines and avg_chars settings.</p>
+END:VEVENT
+
+END:VCALENDAR
