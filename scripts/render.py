@@ -11,6 +11,7 @@ import fire  # type: ignore
 from bs4 import BeautifulSoup  # type: ignore
 from icalendar import Calendar  # type: ignore
 
+
 def as_datetime(value):
     """Convert icalendar date/datetime values to timezone-aware datetime."""
     if isinstance(value, dt):
@@ -49,7 +50,7 @@ def render_date(start: dt, end: dt) -> str:
 
 
 def render_footer() -> str:
-    """Renders the footer"""
+    """Renders the footer."""
     now = dt.now().astimezone()
     footer_pug = ".col-6\n"
     footer_pug += f"    p.mb-0 Last update: {now.strftime('%d/%m/%Y')} at {now.strftime('%H:%M')}\n"
@@ -59,37 +60,95 @@ def render_footer() -> str:
 
 
 def parse_event_name(name: str) -> tuple[str, str, list[str]]:
-    """Parse the title"""
-    # Check if it matches [TYPE] Title (Speaker name, Institution)
+    """Parse the event title.
+
+    Supported formats:
+
+    1. [TAGS] Title (Auth1, Inst1; Auth2, Inst2; Auth3; Auth4, Inst4)
+    2. [TAGS] Title
+    3. Fallback: raw name
+
+    The authors list is optional.
+    For each author, the name is required, while the institution is optional.
+
+    Args:
+        name: Raw event title as found in the ICS SUMMARY field.
+
+    Returns:
+        A tuple containing:
+          - title: The parsed event title.
+          - subtitle: Authors information, if available. Multiple authors are
+            separated by "; ". Empty string if not available.
+          - hashtags: A list of tags parsed from TAGS, may be empty.
+    """
     pattern = re.compile(
-        r"\[(?P<type>.+)\] (?P<title>.+) \((?P<speaker>.+), (?P<institution>.+)\)"
+        r"^\[(?P<type>[^\]]+)\]\s+"
+        r"(?P<title>.*?)"
+        r"(?:\s+\((?P<authors>[^()]*)\))?"
+        r"$"
     )
-    match = pattern.match(name)
-    if match:
-        title = match.group("title")
-        subtitle = f'{match.group("speaker")}, {match.group("institution")}'
-        hashtags = match.group("type").split(",")
-        return title, subtitle, hashtags
 
-    # Try then to match [TYPE] Title (Speaker name)
-    pattern = re.compile(r"\[(?P<type>.+)\] (?P<title>.+) \((?P<speaker>.+)\)")
     match = pattern.match(name)
-    if match:
-        title = match.group("title")
-        subtitle = f'{match.group("speaker")}'
-        hashtags = match.group("type").split(",")
-        return title, subtitle, hashtags
+    if not match:
+        return name, "", []
 
-    # Try then to match [TYPE] Title
-    pattern = re.compile(r"\[(?P<type>.+)\] (?P<title>.+)")
-    match = pattern.match(name)
-    if match:
-        title = match.group("title")
-        subtitle = ""
-        hashtags = match.group("type").split(",")
-        return title, subtitle, hashtags
+    title = match.group("title").strip()
+    hashtags = _split_tags(match.group("type"))
 
-    return name, "", []
+    raw_authors = match.group("authors")
+    if not raw_authors:
+        return title, "", hashtags
+
+    authors = _split_authors(raw_authors)
+    subtitle = ", ".join(authors)
+
+    return title, subtitle, hashtags
+
+
+def _split_authors(raw: str) -> list[str]:
+    """Split and normalize authors.
+
+    Supported author formats:
+
+    - Auth1, Inst1
+    - Auth2, Inst2
+    - Auth3
+
+    Authors are separated by semicolon.
+    The author name is required.
+    The institution is optional.
+    """
+    authors: list[str] = []
+
+    for item in raw.split(";"):
+        item = item.strip()
+        if not item:
+            continue
+
+        parts = [part.strip() for part in item.split(",", maxsplit=1)]
+
+        author = parts[0]
+        if not author:
+            continue
+
+        if len(parts) == 2 and parts[1]:
+            authors.append(f"{author} ({parts[1]})")
+        else:
+            authors.append(author)
+
+    return authors
+
+
+def _split_tags(raw: str) -> list[str]:
+    """Split and normalize tag strings.
+
+    Args:
+        raw: Raw TAGS string, e.g. "Seminar, Physics".
+
+    Returns:
+        A list of normalized tags, spaces removed.
+    """
+    return [tag.title() for tag in raw.split(",") if tag]
 
 
 def render_hashtag(hashtag: str) -> str:
@@ -97,7 +156,7 @@ def render_hashtag(hashtag: str) -> str:
 
 
 def render_card(talk: dict, now: dt, past_event: bool = False) -> str:
-    """Renders the card"""
+    """Renders the card."""
 
     # Parse title
     title, subtitle, hashtags = parse_event_name(talk["Titolo"])
@@ -119,8 +178,8 @@ def render_card(talk: dict, now: dt, past_event: bool = False) -> str:
         # Split by lines
         lines = abstract.split("\n")
 
-        # Keep only the first 6 lines, we consider
-        # an average of 60 chars per line.
+        # Keep only the first 10 lines, considering
+        # an average of 58 chars per line.
         max_lines = 10
         avg_chars = 58
         curr_line = 0
@@ -134,9 +193,11 @@ def render_card(talk: dict, now: dt, past_event: bool = False) -> str:
                 content = content.rsplit(" ", 1)[0]
                 content = content + "..."
                 ellipsis = True
+
             content_lines = math.ceil(len(content) / avg_chars)
             curr_line += max(1, content_lines)
             render_lines.append(content)
+
             if curr_line >= max_lines:
                 break
 
@@ -144,6 +205,7 @@ def render_card(talk: dict, now: dt, past_event: bool = False) -> str:
             last_line = render_lines.pop()
             while len(last_line) == 0:
                 last_line = render_lines.pop()
+
             # Remove trailing spaces
             last_line = last_line.rstrip()
             last_line = last_line + " (...)"
@@ -160,7 +222,6 @@ def render_card(talk: dict, now: dt, past_event: bool = False) -> str:
 
     card_pug += "  .row.g-0\n"
     card_pug += "    .col-md-3\n"
-    # card_pug += "    .col-md-3.d-flex.flex-column.justify-content-between\n"
     card_pug += "      .info\n"
 
     # Date and time
@@ -173,6 +234,7 @@ def render_card(talk: dict, now: dt, past_event: bool = False) -> str:
         card_pug += "          span.badge.bg-danger\n"
         card_pug += "            i.live-icon.bi.bi-broadcast\n"
         card_pug += "            span  LIVE\n"
+
     if past_event:
         card_pug += "        h5\n"
         card_pug += "          span.badge.bg-warning\n"
@@ -182,8 +244,9 @@ def render_card(talk: dict, now: dt, past_event: bool = False) -> str:
     # Hashtags
     if hashtags:
         card_pug += "        .hashtags.mt-3.pt-3.text-muted.small\n"
-        for hashtag in hashtags:
-            card_pug += f"          span.hashtag {render_hashtag(hashtag)}\n"
+        # for hashtag in hashtags:
+        #     card_pug += f"          span.hashtag {render_hashtag(hashtag)}\n"
+        card_pug += f"        span.hashtag {"<br>".join(hashtags)}\n"
 
     # Main content
     card_pug += "    .col-md-9\n"
@@ -194,27 +257,27 @@ def render_card(talk: dict, now: dt, past_event: bool = False) -> str:
     if subtitle:
         card_pug += "        h5.card-subtitle.text-body-secondary\n"
         card_pug += f"          | {subtitle}\n"
+
     if location:
         card_pug += "        p.i.text-body-secondary\n"
         card_pug += f"          | {location}\n"
+
     if abstract:
         card_pug += "        p.mt-1.card-text.abstract\n"
         card_pug += f"          | {abstract}\n"
-    # if hashtags:
-    #     card_pug += "  .card-footer\n"
-    #     card_pug += "    p.mb-0\n"
-    #     for hashtag in hashtags:
-    #         card_pug += f"      span.hashtag {render_hashtag(hashtag)}\n"
+
     return card_pug
 
 
 def main(csv_filename: str, date: Optional[str] = None, number: Optional[int] = 15):
-    """Main"""
+    """Main."""
     talks = []
+
     with open(csv_filename, "rb") as fp:
         # Read file as a string
         file = fp.read().decode("utf-8")
         gcal = Calendar.from_ical(file)
+
         for component in gcal.walk():
             if component.name == "VEVENT":
                 talks.append(
@@ -245,7 +308,7 @@ def main(csv_filename: str, date: Optional[str] = None, number: Optional[int] = 
     if number is None:
         number = len(future)
 
-    # Select cards to render (future and past in reverse order)
+    # Select cards to render: future first, then past in reverse order
     cards = future[:number]
     past_number = max(number - len(cards), 0)
     cards = cards + list(reversed(past))[:past_number]

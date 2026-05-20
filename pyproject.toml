@@ -1,0 +1,13 @@
+[project]
+name = "edvige"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "beautifulsoup4>=4.14.3",
+    "fire>=0.7.1",
+    "icalendar>=7.1.1",
+    "lxml>=6.1.1",
+    "requests>=2.34.2",
+]
