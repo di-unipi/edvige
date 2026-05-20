@@ -246,7 +246,7 @@ def render_card(talk: dict, now: dt, past_event: bool = False) -> str:
         card_pug += "        .hashtags.mt-3.pt-3.text-muted.small\n"
         # for hashtag in hashtags:
         #     card_pug += f"          span.hashtag {render_hashtag(hashtag)}\n"
-        card_pug += f"        span.hashtag {"<br>".join(hashtags)}\n"
+        card_pug += f"        span.hashtag {'<br>'.join(hashtags)}\n"
 
     # Main content
     card_pug += "    .col-md-9\n"
