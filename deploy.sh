@@ -7,4 +7,7 @@ rsync -avz --delete \
 	--exclude "deploy.sh" \
 	--exclude "logs/" \
 	--exclude "www/" \
+	--exclude "uv.lock" \
+	--exclude "data/" \
+	--exclude "pyproject.toml" \
 	./ edvige:edvige/
