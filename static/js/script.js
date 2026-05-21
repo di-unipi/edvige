@@ -9,8 +9,6 @@
     The code is written in vanilla JavaScript.
 */
 
-const CARD_FIT_TOLERANCE = 140;
-
 // Column getter
 function get_column(column_id) {
   if (column_id == 0) {
@@ -24,23 +22,24 @@ function get_column(column_id) {
 
 function outer_height(elem) {
   const style = window.getComputedStyle(elem);
-  return elem.offsetHeight + parseFloat(style.marginTop || 0) + parseFloat(style.marginBottom || 0);
+  return (
+    elem.offsetHeight +
+    parseFloat(style.marginTop || 0) +
+    parseFloat(style.marginBottom || 0)
+  );
 }
 
-function column_height_limit(column) {
+function column_height_limit() {
   const footer = document.querySelector("footer");
   const footer_height = footer ? outer_height(footer) : 0;
-  const column_top = column.getBoundingClientRect().top;
-  return Math.max(0, window.innerHeight - column_top - footer_height);
+  return Math.max(0, window.innerHeight - 1.5 * footer_height);
 }
 
 function arrange_cards() {
   var left_column = get_column(0);
-  var col_height = column_height_limit(left_column);
-  var relaxed_col_height = col_height + CARD_FIT_TOLERANCE;
+  var max_col_height = column_height_limit();
   var column_count = 3;
-  console.log("Left height: " + col_height);
-  console.log("Relaxed height: " + relaxed_col_height);
+  console.log("Max height per column: " + max_col_height);
 
   // Initialize usage
   let used = [0, 0, 0];
@@ -91,7 +90,7 @@ function arrange_cards() {
     console.log("Used: " + used);
 
     // Check if there are free columns
-    while (used[current] + card_height > relaxed_col_height) {
+    while (used[current] + card_height > max_col_height) {
       current++;
       if (current >= column_count) {
         full = true;

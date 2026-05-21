@@ -4,7 +4,9 @@ Render in Pug format the next talks
 
 import math
 import re
-from datetime import datetime as dt, date as d, time
+from datetime import date as d
+from datetime import datetime as dt
+from datetime import time
 from typing import Optional
 
 import fire  # type: ignore
@@ -180,7 +182,7 @@ def render_card(talk: dict, now: dt, past_event: bool = False) -> str:
 
         # Keep only the first 10 lines, considering
         # an average of 58 chars per line.
-        max_lines = 10
+        max_lines = 7
         avg_chars = 58
         curr_line = 0
         render_lines = []
