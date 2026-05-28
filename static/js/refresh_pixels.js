@@ -1,8 +1,7 @@
 const fps = 1;
 const shift = 5;
-var counter = 0;
 var msgIndex = 0;
-var target = 5;
+var has_printed = false;
 
 function init() {
   window.requestAnimationFrame(draw);
@@ -52,9 +51,15 @@ messages = [
   "MAYBE",
   "I'M NOT SURE",
   "I'M JUST A COMPUTER",
-]
+];
 
 function draw() {
+  // Check if the last message has been printed
+  if (msgIndex >= messages.length) {
+    // Refresh the page
+    location.reload();
+  }
+
   // Set canvas size based on the window size
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -80,18 +85,9 @@ function draw() {
     }
   }
 
-  // Write text in the middle of the canvas
-  if (counter < target) {
-    counter++;
-  }
-  else {
-    counter = 0;
+  // Write text one every two seconds
+  if (!has_printed) {
     var text = messages[msgIndex];
-    if (text == "REFRESHING PIXELS") {
-      target = 5;
-    } else {
-      target = 1;
-    }
     var fontSize = 120;
     ctx.font = "bold " + fontSize + "px Arial"; // Bold font
     ctx.fillStyle = "white";
@@ -102,11 +98,11 @@ function draw() {
     var textX = (canvas.width - textWidth) / 2;
     var textY = (canvas.height + textHeight) / 2;
     ctx.fillText(text, textX, textY);
-    msgIndex = (msgIndex + 1) % messages.length;
+    msgIndex = msgIndex + 1;
+    has_printed = true;
+  } else {
+    has_printed = false;
   }
-
-  // Update counter
-
 
   setTimeout(() => {
     window.requestAnimationFrame(draw);
