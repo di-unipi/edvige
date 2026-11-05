@@ -2,15 +2,18 @@
 Render the next talks as the HTML page
 """
 
+import contextlib
 import math
 import os
 import re
+import tempfile
 from datetime import date as d
 from datetime import datetime as dt
-from datetime import time
+from datetime import time, timedelta
 from typing import Optional
 
 import fire  # type: ignore
+import recurring_ical_events  # type: ignore
 from bs4 import BeautifulSoup  # type: ignore
 from icalendar import Calendar  # type: ignore
 from jinja2 import Environment, FileSystemLoader
@@ -18,6 +21,10 @@ from jinja2 import Environment, FileSystemLoader
 TEMPLATE_DIR = "layout"
 TEMPLATE_NAME = "index.html.j2"
 LOCANDINA = "static/assets/locandina.png"
+
+# Time window in which recurring events are expanded
+LOOKBEHIND = timedelta(days=365)
+LOOKAHEAD = timedelta(days=365)
 
 
 def as_datetime(value):
@@ -34,6 +41,26 @@ def as_datetime(value):
 def suffix(d: int) -> str:
     """Returns the correct suffix for a given day of the month."""
     return "th" if 11 <= d <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(d % 10, "th")
+
+
+def render_day(value: dt) -> str:
+    """Renders the day of the month with its suffix, e.g. 5th November."""
+    return f"{value.day}{suffix(value.day)} {value.strftime('%B')}"
+
+
+def render_when(start: dt, end: dt, all_day: bool) -> str:
+    """Renders the time span of an event, given its start and end."""
+    # The end is exclusive: an event ending at midnight ends the day before
+    last = end - timedelta(microseconds=1) if end > start else end
+    same_day = last.date() == start.date()
+
+    if all_day:
+        return "All day" if same_day else f"Until {render_day(last)}"
+
+    if same_day:
+        return f"{start.strftime('%H:%M')}-{end.strftime('%H:%M')}"
+
+    return f"{start.strftime('%H:%M')} until {render_day(end)}, {end.strftime('%H:%M')}"
 
 
 def parse_event_name(name: str) -> tuple[str, str, list[str]]:
@@ -137,6 +164,12 @@ def truncate_abstract(abstract: str) -> list[str]:
     # Split by lines
     lines = abstract.split("\n")
 
+    # Drop leading and trailing blank lines
+    while lines and not lines[0].strip():
+        lines.pop(0)
+    while lines and not lines[-1].strip():
+        lines.pop()
+
     # Keep only the first 10 lines, considering
     # an average of 58 chars per line.
     max_lines = 7
@@ -161,14 +194,11 @@ def truncate_abstract(abstract: str) -> list[str]:
             break
 
     if not ellipsis and len(lines) > len(render_lines):
-        last_line = render_lines.pop()
-        while len(last_line) == 0:
-            last_line = render_lines.pop()
-
-        # Remove trailing spaces
-        last_line = last_line.rstrip()
-        last_line = last_line + " (...)"
-        render_lines.append(last_line)
+        # Drop trailing blank lines, then mark the truncation
+        while render_lines and not render_lines[-1].strip():
+            render_lines.pop()
+        if render_lines:
+            render_lines[-1] = render_lines[-1].rstrip() + " (...)"
 
     return render_lines
 
@@ -179,10 +209,7 @@ def build_event(talk: dict, now: dt, past_event: bool = False) -> dict:
     # Parse title
     title, subtitle, hashtags = parse_event_name(talk["Titolo"])
 
-    # Get cardinal day without leading zero, with suffix
     start, end = talk["Inizio"], talk["Fine"]
-    day = f"{start.day}{suffix(start.day)}"
-
     abstract = talk["Abstract"]
 
     return {
@@ -191,21 +218,30 @@ def build_event(talk: dict, now: dt, past_event: bool = False) -> dict:
         "hashtags": hashtags,
         "location": talk["Luogo"],
         "abstract": truncate_abstract(abstract) if abstract else [],
-        "day": day,
+        "day": f"{start.day}{suffix(start.day)}",
         "month": start.strftime("%B"),
-        "start_time": start.strftime("%H:%M"),
-        "end_time": end.strftime("%H:%M"),
+        "when": render_when(start, end, talk["TuttoIlGiorno"]),
         "live": start < now < end,
         "past": past_event,
     }
 
 
 def write_atomic(path: str, content: str):
-    """Writes the file via a temporary file, so readers never see a partial page."""
-    tmp_path = os.path.join(os.path.dirname(path) or ".", f".{os.path.basename(path)}.tmp")
-    with open(tmp_path, "w", encoding="utf-8") as f:
-        f.write(content)
-    os.replace(tmp_path, path)
+    """Writes the file via a unique temporary file, so readers never see a partial page."""
+    directory = os.path.dirname(path) or "."
+    fd, tmp_path = tempfile.mkstemp(
+        dir=directory, prefix=f".{os.path.basename(path)}.", suffix=".tmp"
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.write(content)
+        # mkstemp creates the file as private, the page must be readable
+        os.chmod(tmp_path, 0o644)
+        os.replace(tmp_path, path)
+    except BaseException:
+        with contextlib.suppress(FileNotFoundError):
+            os.unlink(tmp_path)
+        raise
 
 
 def main(
@@ -215,6 +251,12 @@ def main(
     number: Optional[int] = 15,
 ):
     """Main."""
+    # Get current date and time
+    if not date:
+        now = dt.now().astimezone()
+    else:
+        now = dt.strptime(date, "%d/%m/%Y").astimezone()
+
     talks = []
 
     with open(ics_filename, "rb") as fp:
@@ -222,23 +264,24 @@ def main(
         file = fp.read().decode("utf-8")
         gcal = Calendar.from_ical(file)
 
-        for component in gcal.walk():
-            if component.name == "VEVENT":
-                talks.append(
-                    {
-                        "Titolo": component.get("summary"),
-                        "Inizio": as_datetime(component.get("dtstart").dt),
-                        "Fine": as_datetime(component.get("dtend").dt),
-                        "Luogo": component.get("location"),
-                        "Abstract": component.get("description"),
-                    }
-                )
+    # Expand recurring events, applying exceptions and moved occurrences
+    for component in recurring_ical_events.of(gcal).between(now - LOOKBEHIND, now + LOOKAHEAD):
+        # Skip cancelled events
+        if str(component.get("status", "")).upper() == "CANCELLED":
+            continue
 
-    # Get current date and time
-    if not date:
-        now = dt.now().astimezone()
-    else:
-        now = dt.strptime(date, "%d/%m/%Y").astimezone()
+        start = component.get("dtstart").dt
+        talks.append(
+            {
+                "Titolo": component.get("summary"),
+                "Inizio": as_datetime(start),
+                # The end is always set, computed from DURATION if missing
+                "Fine": as_datetime(component.get("dtend").dt),
+                "TuttoIlGiorno": not isinstance(start, dt),
+                "Luogo": component.get("location"),
+                "Abstract": component.get("description"),
+            }
+        )
 
     # Sort by start time
     talks.sort(key=lambda t: t["Inizio"])
@@ -253,9 +296,9 @@ def main(
         number = len(future)
 
     # Select cards to render: future first, then past in reverse order
-    cards = future[:number]
+    cards = [(talk, False) for talk in future[:number]]
     past_number = max(number - len(cards), 0)
-    cards = cards + list(reversed(past))[:past_number]
+    cards += [(talk, True) for talk in list(reversed(past))[:past_number]]
 
     # Render the page
     env = Environment(
@@ -264,7 +307,7 @@ def main(
     )
     template = env.get_template(TEMPLATE_NAME)
     page = template.render(
-        events=[build_event(talk, now, past_event=talk not in future) for talk in cards],
+        events=[build_event(talk, now, past_event=is_past) for talk, is_past in cards],
         locandina=os.path.isfile(LOCANDINA),
         updated=dt.now().astimezone(),
     )

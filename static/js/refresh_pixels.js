@@ -7,7 +7,7 @@ function init() {
   window.requestAnimationFrame(draw);
 }
 
-messages = [
+const messages = [
   "REFRESHING PIXELS",
   "REFRESHING PIXELS",
   "REFRESHING PIXELS",
@@ -58,14 +58,16 @@ function draw() {
   if (msgIndex >= messages.length) {
     // Refresh the page
     location.reload();
+    return;
   }
 
   // Set canvas size based on the window size
+  const canvas = document.getElementById("canvas");
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   console.log(canvas.width, canvas.height);
 
-  const ctx = document.getElementById("canvas").getContext("2d");
+  const ctx = canvas.getContext("2d");
 
   // Clear the canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);

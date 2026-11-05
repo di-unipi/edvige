@@ -1,7 +1,8 @@
 #! /bin/bash
 # Script to refresh pixels from firefox.
-rm www/index.html
-cp www/refresh_pixels.html www/index.html
+# Swap the page atomically, so the browser never reloads a missing page
+cp www/refresh_pixels.html www/.index.html.pixels.tmp
+mv -f www/.index.html.pixels.tmp www/index.html
 
 # # Set display for xdotool
 # export DISPLAY=":0.0"
