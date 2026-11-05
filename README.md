@@ -56,5 +56,5 @@ python3 -m http.server 8000
 The `deploy.sh` script can be used to deploy the changes to the Raspberry Pi via `rsync`.
 
 ```bash
-bash scripts/deploy.sh
+bash deploy.sh
 ```
