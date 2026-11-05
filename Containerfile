@@ -1,30 +1,22 @@
-# Use Node.js 17.9.0 on Debian Bullseye as the base image
-FROM node:17.9.0-bullseye
+# Use Python 3.12 on Debian Bookworm as the base image
+FROM python:3.12-slim-bookworm
 
 # Set environment variables to avoid user input prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Set container to have Europe/Rome timezone
-RUN ln -sf /usr/share/zoneinfo/Europe/Rome /etc/localtime && \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends tzdata && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* && \
+    ln -sf /usr/share/zoneinfo/Europe/Rome /etc/localtime && \
     echo "Europe/Rome" > /etc/timezone
-
-# Update the package list and install prerequisites
-RUN apt-get update && \
-    apt-get install -y curl software-properties-common build-essential
-
-# Update package list and install necessary packages
-RUN apt-get update && \
-    apt-get install -y python3.9 python3-pip curl && \
-    apt-get clean
 
 # Create and enter the /edvige directory
 WORKDIR /edvige
 
-# Install dependencies
-COPY package.json package-lock.json ./
+# Install pinned dependencies (exported from uv.lock)
 COPY requirements.txt .
-RUN npm ci && \
-    pip3 install -r requirements.txt
+RUN pip3 install --no-cache-dir --require-hashes -r requirements.txt
 
-# Run npm run calendar when the container starts
-CMD ["npm", "run", "calendar"]
+# Render the calendar when the container starts
+CMD ["bash", "scripts/calendar.sh"]

@@ -19,6 +19,15 @@ Then, you can run the script to populate the `www` folder with the rendered webs
 bash scripts/calendar_podman.sh
 ```
 
+The page is rendered by `scripts/render.py` from the [Jinja2](https://jinja.palletsprojects.com/) template `layout/index.html.j2`, with HTML autoescaping enabled. The poster column is shown when `static/assets/locandina.png` exists.
+
+The container installs the pinned dependencies listed in `requirements.txt`. After changing the dependencies in `pyproject.toml`, update the lock file and regenerate it with [uv](https://docs.astral.sh/uv/), then rebuild the image:
+
+```bash
+uv lock
+uv export --format requirements-txt --no-dev --no-emit-project -o requirements.txt
+```
+
 ## Workflow
 
 This repository is downloaded on a Raspberry Pi 3B that renders and serves the web page. Every five minutes, a cronjob runs the `calendar_podman.sh`. The page automatically refreshes every 60 seconds via the `autorefresh.js` script.

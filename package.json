@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "pug-cli": "^1.0.0-alpha6"
-  },
-  "scripts": {
-    "calendar": "bash scripts/calendar.sh"
-  }
-}
