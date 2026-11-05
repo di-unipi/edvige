@@ -245,10 +245,9 @@ figcaption {
     width: 100%;
 }
 
-/* Footer: same content, set as a data line under a heavy rule */
+/* Footer: same content, set as a data line on a darker band */
 .footer {
     padding: 0.5rem 0;
-    border-top: var(--rule-heavy) solid var(--grey-100);
     background: var(--grey-850);
     color: var(--grey-300);
     font-family: var(--font-mono);
