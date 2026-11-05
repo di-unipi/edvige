@@ -1,85 +1,269 @@
-.info {
-    padding: var(--bs-card-spacer-y) var(--bs-card-spacer-x);
-    background-color: #283542;
-    /* Curvature of the border */
-    border-radius: 0.25rem 0 0 0.25rem;
-    height: 100%;
+/*
+    Edvige: flat, rectilinear, typographic.
+
+    Palette: the original cool greys and orange accent. The accent marks
+    what matters at a glance (dates, live events, the welcome card).
+    Type: IBM Plex Sans for reading, IBM Plex Mono for data and labels.
+    Scale: 0.75 / 0.9375 / 1 / 1.5 / 2.5 / 3rem on a 1.5 line height.
+*/
+
+:root[data-bs-theme=dark] {
+    --grey-900: #1f2933;
+    --grey-850: #283542;
+    --grey-700: #3e4c59;
+    --grey-500: #616e7c;
+    --grey-400: #7b8794;
+    --grey-300: #9aa5b1;
+    --grey-200: #cbd2d9;
+    --grey-100: #e4e7eb;
+    --accent: #ffad44;
+
+    --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+    --rule-heavy: 4px;
+    --rule: 2px;
+
+    --bs-body-font-family: var(--font-sans);
+    --bs-body-font-size: 1rem;
+    --bs-body-line-height: 1.5;
+    --bs-body-bg: var(--grey-900);
+    --bs-body-color: var(--grey-100);
+    --bs-border-radius: 0;
 }
 
 body {
-    background: linear-gradient(
-        #1f2933,
-        #303030,
-        #1f2933 50%,
-        #303030,
-        #1f2933
-    );
-    background-size: 100% 200%;
-    animation-iteration-count: 1;
-    animation-name: gradient;
-    animation-duration: 10s;
-    color: #e4e7eb;
+    background: var(--grey-900);
+    color: var(--grey-100);
+    font-kerning: normal;
+    font-variant-ligatures: common-ligatures;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
 }
 
-.card-title {
-    font-weight: bold;
-    color: #ffad44;
+p {
+    margin: 0;
+}
+
+/* Labels: small monospaced capitals, tracked out for legibility */
+.kicker,
+.weekday,
+.month,
+.status,
+figcaption {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    line-height: 1.25;
+    text-transform: uppercase;
+}
+
+/* Cards: flat slabs under a heavy rule, no rounding, no shadows */
+.card {
+    --bs-card-bg: var(--grey-850);
+    --bs-card-border-width: 0;
+    --bs-card-border-radius: 0;
+    --bs-card-inner-border-radius: 0;
+    --bs-card-spacer-x: 1rem;
+    --bs-card-spacer-y: 1rem;
+    border-top: var(--rule-heavy) solid var(--grey-100);
+}
+
+/* Event date and time */
+.info {
+    height: 100%;
+    padding: var(--bs-card-spacer-y) var(--bs-card-spacer-x);
+    border-right: var(--rule) solid var(--grey-700);
+}
+
+.date {
+    display: flex;
+    flex-direction: column;
+}
+
+.weekday,
+.month {
+    color: var(--grey-300);
 }
 
 .day {
-    font-weight: bold;
-    margin-bottom: -0.2rem !important;
+    margin: 0.125rem 0 0.25rem;
+    color: var(--accent);
+    font-size: 3rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums lining-nums;
+    letter-spacing: -0.02em;
+    line-height: 1;
 }
 
-.month {
-    font-weight: bold;
+.time {
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: var(--rule) solid var(--grey-700);
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    line-height: 1.25;
 }
 
-.hashtag {
-    color: #ffad44;
+.status {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.25rem 0.5rem;
 }
 
-.location::before {
-    content: "“";
+.status-live {
+    background: var(--accent);
+    color: var(--grey-900);
 }
 
-.location::after {
-    content: "“";
+.status-ended {
+    border: var(--rule) solid var(--grey-400);
+    color: var(--grey-300);
 }
 
-.card-footer {
-    text-align: right;
-}
-
-.live-icon {
-    animation: blinker 1.5s step-start infinite;
-}
-
-@keyframes blinker {
-    50% {
-        opacity: 0;
-    }
-}
-
-.text-large {
-    font-size: 110%;
+.live-event {
+    border-top-color: var(--accent);
 }
 
 .past-event {
-    opacity: 0.4;
+    opacity: 0.45;
 }
 
-.bi {
-    display: inline-block;
-    vertical-align: 0.095em;
-    fill: currentcolor;
+/* Event description */
+.event .card-body {
+    padding: var(--bs-card-spacer-y) var(--bs-card-spacer-x);
+}
+
+.hashtags {
+    margin-bottom: 0.5rem;
+    color: var(--accent);
+}
+
+.card-title {
+    margin: 0;
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    text-wrap: balance;
+}
+
+.card-subtitle {
+    margin-top: 0.5rem;
+    color: var(--grey-200);
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.location {
+    margin-top: 0.25rem;
+    color: var(--grey-300);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+}
+
+.abstract {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: var(--rule) solid var(--grey-700);
+    color: var(--grey-200);
+    font-size: 0.9375rem;
+    hyphens: auto;
+    line-height: 1.45;
+    text-wrap: pretty;
+}
+
+/* Welcome card: a solid accent block, dark type */
+.welcome {
+    --bs-card-bg: var(--accent);
+    border-top-color: var(--grey-900);
+    color: var(--grey-900);
+}
+
+.welcome-text {
+    padding-right: 1rem;
+}
+
+.welcome .kicker {
+    color: var(--grey-900);
+}
+
+.welcome-title {
+    margin: 0.5rem 0 0.75rem;
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+}
+
+.welcome-lead {
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.welcome-contact {
+    margin-top: 0.75rem;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+}
+
+.welcome a {
+    color: var(--grey-900);
+    font-weight: 600;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.15em;
+}
+
+.qr {
+    margin: 0;
+}
+
+.qr img {
+    display: block;
+    width: 100%;
+    border: var(--rule) solid var(--grey-900);
+}
+
+.qr figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.6875rem;
+    text-align: center;
+}
+
+/* Poster */
+.poster {
+    --bs-card-bg: transparent;
+}
+
+.poster img {
+    display: block;
+    width: 100%;
+}
+
+/* Footer: same content, set as a data line on a darker band */
+.footer {
+    padding: 0.5rem 0;
+    background: var(--grey-850);
+    color: var(--grey-300);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
 }
 
 .stale {
-    color: var(--bs-danger) !important;
-    font-weight: bold;
+    display: inline-block;
+    padding: 0 0.5rem;
+    background: var(--accent);
+    color: var(--grey-900) !important;
+    font-weight: 600;
 }
 
 .stale::before {
-    content: "⚠ Outdated! ";
+    content: "Outdated: ";
+    text-transform: uppercase;
 }

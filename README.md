@@ -19,7 +19,7 @@ Then, you can run the script to populate the `www` folder with the rendered webs
 bash scripts/calendar_podman.sh
 ```
 
-The page is rendered by `scripts/render.py` from the [Jinja2](https://jinja.palletsprojects.com/) template `layout/index.html.j2`, with HTML autoescaping enabled. Recurring events are expanded with [recurring-ical-events](https://pypi.org/project/recurring-ical-events/), and cancelled events are skipped. The poster column is shown when `static/assets/locandina.png` exists. Bootstrap and Bootstrap Icons are served from `static/vendor/`, so the screen does not depend on a CDN.
+The page is rendered by `scripts/render.py` from the [Jinja2](https://jinja.palletsprojects.com/) template `layout/index.html.j2`, with HTML autoescaping enabled. Recurring events are expanded with [recurring-ical-events](https://pypi.org/project/recurring-ical-events/), and cancelled events are skipped. The poster column is shown when `static/assets/locandina.png` exists. Bootstrap and the IBM Plex Sans and Mono fonts (SIL Open Font License) are served from `static/vendor/`, so the screen does not depend on a CDN.
 
 Both stdout and stderr of each run are logged in `logs/calendar.log`, which is rotated to `logs/calendar.log.1` when it exceeds 1 MB. A run is skipped if the previous one is still in progress. When the page has not been updated for more than 15 minutes, its footer shows an "Outdated!" warning: check the log.
 

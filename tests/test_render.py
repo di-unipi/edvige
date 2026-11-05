@@ -82,9 +82,10 @@ DTSTART;TZID={TZ}:20261119T150000
 DTEND;TZID={TZ}:20261119T160000
 SUMMARY:[Seminar] Weekly (moved)
 """), number=3)
-        days = [c.select_one(".day").get_text() + " " + c.select_one(".info p").get_text() for c in cards]
+        days = [c.select_one(".date").get_text(" ") + " " + c.select_one(".time").get_text() for c in cards]
         # 12th is excluded, 19th is moved to the afternoon
-        self.assertEqual(days, ["5th 10:00-11:00", "19th 15:00-16:00", "26th 10:00-11:00"])
+        self.assertEqual(days, ["Thu 5 November 10:00\u201311:00", "Thu 19 November 15:00\u201316:00",
+                                "Thu 26 November 10:00\u201311:00"])
         self.assertTrue(all("past-event" not in c["class"] for c in cards))
 
     def test_cancelled_events_are_skipped(self):
@@ -114,7 +115,7 @@ DTSTART:20261111T090000Z
 DURATION:PT2H
 SUMMARY:[Seminar] With duration
 """))
-        self.assertEqual([c.select_one(".info p").get_text() for c in cards], ["All day", "10:00-12:00"])
+        self.assertEqual([c.select_one(".time").get_text() for c in cards], ["All day", "10:00\u201312:00"])
 
     def test_past_events_fill_remaining_cards(self):
         cards = self.render(ics("""
@@ -148,7 +149,7 @@ DTSTART:20261110T090000Z
 DTEND:20261110T100000Z
 SUMMARY:[Seminar, Physics] Tagged
 """))
-        self.assertEqual(cards[0].select_one(".hashtags .hashtag").get_text(), "Seminar, Physics")
+        self.assertEqual(cards[0].select_one(".hashtags .hashtag").get_text(), "Seminar / Physics")
 
     def test_last_update_is_machine_readable(self):
         self.render(ics())
@@ -172,7 +173,7 @@ DESCRIPTION:&lt;img src=x onerror=alert(1)&gt; #[b x]
         self.assertNotIn("<b>x</b>", self.html)
         card = cards[0]
         self.assertIn("<script>alert(1)</script>", card.select_one(".card-title").get_text())
-        self.assertEqual(card.select_one("p.i").get_text(), "Room !{1} <b>x</b>")
+        self.assertEqual(card.select_one(".location").get_text(), "Room !{1} <b>x</b>")
         self.assertEqual(card.select_one(".abstract").get_text(), "<img src=x onerror=alert(1)> #[b x]")
 
 
@@ -200,22 +201,22 @@ class TestWhen(unittest.TestCase):
 
     def test_same_day(self):
         self.assertEqual(render.render_when(self.at(2026, 11, 5, 14), self.at(2026, 11, 5, 15, 30), False),
-                         "14:00-15:30")
+                         "14:00\u201315:30")
 
     def test_ending_at_midnight(self):
         self.assertEqual(render.render_when(self.at(2026, 11, 5, 20), self.at(2026, 11, 6), False),
-                         "20:00-00:00")
+                         "20:00\u201300:00")
 
     def test_multi_day(self):
         self.assertEqual(render.render_when(self.at(2026, 11, 5, 9), self.at(2026, 11, 7, 18), False),
-                         "09:00 until 7th November, 18:00")
+                         "09:00 until 7 November, 18:00")
 
     def test_all_day(self):
         self.assertEqual(render.render_when(self.at(2026, 11, 5), self.at(2026, 11, 6), True), "All day")
 
     def test_all_day_multi_day(self):
         self.assertEqual(render.render_when(self.at(2026, 11, 5), self.at(2026, 11, 8), True),
-                         "Until 7th November")
+                         "Until 7 November")
 
 
 class TestWriteAtomic(unittest.TestCase):

@@ -8,64 +8,63 @@
     <meta name="author" content="R. Massidda">
     <link href="favicon.svg" rel="icon">
     <link href="vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
-    <link href="vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="vendor/fonts/fonts.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
     <script src="js/script.js" defer></script>
     <script src="js/autorefresh.js" defer></script>
   </head>
   <body class="d-flex flex-column h-100">
     <main class="flex-shrink-0">
-      <div class="container-fluid mt-4 ml-4 mr-4">
+      <div class="container-fluid mt-4">
         <div class="row g-4">
           <div class="col-4 h-100" id="left">
-            <div class="card mb-3 special-card">
+            <div class="card mb-3 special-card welcome">
               <div class="card-body">
-                <div class="h4 card-title">Hey there! 🦉</div>
-                <div class="row gx-5 mt-3">
-                  <div class="col-md-8">
-                    <p class="text-large"><strong>Edvige</strong>'s here to help you
-                      keep track of the events you care about.
-                    </p>
-                    <p>
-                      Something's not working?<br>
-                      Drop us a line at
-                      <a href="mailto:comunicazione@di.unipi.it">comunicazione@di.unipi.it</a>
-                    </p>
+                <div class="row g-0">
+                  <div class="col-md-8 welcome-text">
+                    <p class="kicker">Dept. of Computer Science · Unipi</p>
+                    <h1 class="welcome-title">Edvige <span class="owl" aria-hidden="true">🦉</span></h1>
+                    <p class="welcome-lead">Seminars, talks and events at the Department, straight from our calendar.</p>
+                    <p class="welcome-contact">Something wrong? Write to <a href="mailto:comunicazione@di.unipi.it">comunicazione@di.unipi.it</a></p>
                   </div>
-                  <div class="col-md-4 text-center"><img class="rounded mt-0 mb-0" src="assets/qr.png" width="85%"></div>
+                  <div class="col-md-4">
+                    <figure class="qr">
+                      <img src="assets/qr.png" alt="QR code linking to the Department calendar">
+                      <figcaption>Scan for the calendar</figcaption>
+                    </figure>
+                  </div>
                 </div>
               </div>
             </div>
             {%- for event in events %}
-            <div class="card mb-3{% if event.past %} past-event{% endif %} invisible">
+            <div class="card mb-3 event{% if event.live %} live-event{% endif %}{% if event.past %} past-event{% endif %} invisible">
               <div class="row g-0">
                 <div class="col-md-3">
                   <div class="info">
-                    <h3 class="day mb-0">{{ event.day }}</h3>
-                    <h5 class="month mb-0">{{ event.month }}</h5>
-                    <p>{{ event.when }}</p>
+                    <p class="date"><span class="weekday">{{ event.weekday }}</span><span class="day">{{ event.day }}</span><span class="month">{{ event.month }}</span></p>
+                    <p class="time">{{ event.when }}</p>
                     {%- if event.live %}
-                    <h4><span class="badge bg-danger"><i class="live-icon bi bi-broadcast"></i><span> LIVE</span></span></h4>
+                    <p class="status status-live">Live</p>
                     {%- endif %}
                     {%- if event.past %}
-                    <h5><span class="badge bg-warning"><i class="bi bi-hourglass-bottom"></i> Ended!</span></h5>
-                    {%- endif %}
-                    {%- if event.hashtags %}
-                    <div class="hashtags mt-3 pt-3 text-muted small"><span class="hashtag">{{ event.hashtags | join(", ") }}</span></div>
+                    <p class="status status-ended">Ended</p>
                     {%- endif %}
                   </div>
                 </div>
                 <div class="col-md-9">
                   <div class="card-body">
+                    {%- if event.hashtags %}
+                    <p class="kicker hashtags"><span class="hashtag">{{ event.hashtags | join(" / ") }}</span></p>
+                    {%- endif %}
                     <h3 class="card-title">{{ event.title }}</h3>
                     {%- if event.subtitle %}
-                    <h5 class="card-subtitle text-body-secondary">{{ event.subtitle }}</h5>
+                    <p class="card-subtitle">{{ event.subtitle }}</p>
                     {%- endif %}
                     {%- if event.location %}
-                    <p class="i text-body-secondary">{{ event.location }}</p>
+                    <p class="location">{{ event.location }}</p>
                     {%- endif %}
                     {%- if event.abstract %}
-                    <p class="mt-1 card-text abstract">
+                    <p class="card-text abstract">
                       {%- for line in event.abstract %}{{ line }}{% if not loop.last %}<br>
                       {% endif %}{% endfor -%}
                     </p>
@@ -79,22 +78,22 @@
           <div class="col-4 h-100" id="center"></div>
           <div class="col-4 h-100" id="right">
             {%- if locandina %}
-            <div class="card mb-3 special-card">
-              <div class="card-body"><img class="rounded mt-0 mb-0" src="assets/locandina.png" width="100%"></div>
+            <div class="card mb-3 special-card poster">
+              <img src="assets/locandina.png" alt="Poster of an upcoming event">
             </div>
             {%- endif %}
           </div>
         </div>
       </div>
     </main>
-    <footer class="footer mt-auto py-2 bg-body-tertiary mb-0">
+    <footer class="footer mt-auto">
       <div class="container-fluid">
-        <div class="row text-body-secondary">
+        <div class="row">
           <div class="col-6">
-            <p class="mb-0" id="last-update" data-updated="{{ updated.isoformat(timespec="seconds") }}">Last update: {{ updated.strftime("%d/%m/%Y") }} at {{ updated.strftime("%H:%M") }}</p>
+            <p id="last-update" data-updated="{{ updated.isoformat(timespec="seconds") }}">Last update: {{ updated.strftime("%d/%m/%Y") }} at {{ updated.strftime("%H:%M") }}</p>
           </div>
           <div class="col-6 text-end">
-            <p class="mb-0">Made with ❤️ by the Department's Communication Team</p>
+            <p>Made with ❤️ by the Department’s Communication Team</p>
           </div>
         </div>
       </div>
