@@ -40,13 +40,15 @@ Other scripts used by the cronjob are:
 - `monitor.sh` to turn on and off the TV screen at specific times, and
 - `refresh_pixels.sh` to refresh the screen pixels to avoid burn-in effects.
 
+Install the crontab as the user that owns the repository, cloned in `~/edvige`; cron sets `$HOME` to that user's home directory. Cron discards the output of the jobs when no mail server is installed, so a job that fails before `calendar.sh` starts leaves no trace in `logs/calendar.log`: run the command by hand, or check `journalctl -t CRON`.
+
 ```
 # m h  dom mon dow   command
-*/5 8-17 * * 1-5 cd /home/pi/edvige && bash scripts/calendar_podman.sh
-0-25/5 18 * * 1-5 cd /home/pi/edvige && bash scripts/calendar_podman.sh
-30 18 * * 1-5 cd /home/pi/edvige && bash scripts/refresh_pixels.sh
-30 8  * * 1-5 cd /home/pi/edvige && bash scripts/monitor.sh on
-40 18 * * 1-5 cd /home/pi/edvige && bash scripts/monitor.sh off
+*/5 8-17 * * 1-5 cd "$HOME"/edvige && bash scripts/calendar_podman.sh
+0-25/5 18 * * 1-5 cd "$HOME"/edvige && bash scripts/calendar_podman.sh
+30 18 * * 1-5 cd "$HOME"/edvige && bash scripts/refresh_pixels.sh
+30 8  * * 1-5 cd "$HOME"/edvige && bash scripts/monitor.sh on
+40 18 * * 1-5 cd "$HOME"/edvige && bash scripts/monitor.sh off
 ```
 
 The calendar is rendered from 8:00, so the page is up to date when the screen turns on at 8:30. It is not rendered after 18:25, so the pixel refresh started at 18:30 runs until the screen turns off. The next morning, the first render restores the calendar.
