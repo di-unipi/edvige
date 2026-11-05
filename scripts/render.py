@@ -38,14 +38,9 @@ def as_datetime(value):
     raise TypeError(f"Unsupported date type: {type(value)}")
 
 
-def suffix(d: int) -> str:
-    """Returns the correct suffix for a given day of the month."""
-    return "th" if 11 <= d <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(d % 10, "th")
-
-
 def render_day(value: dt) -> str:
-    """Renders the day of the month with its suffix, e.g. 5th November."""
-    return f"{value.day}{suffix(value.day)} {value.strftime('%B')}"
+    """Renders the day of the month, e.g. 5 November."""
+    return f"{value.day} {value.strftime('%B')}"
 
 
 def render_when(start: dt, end: dt, all_day: bool) -> str:
@@ -58,7 +53,7 @@ def render_when(start: dt, end: dt, all_day: bool) -> str:
         return "All day" if same_day else f"Until {render_day(last)}"
 
     if same_day:
-        return f"{start.strftime('%H:%M')}-{end.strftime('%H:%M')}"
+        return f"{start.strftime('%H:%M')}\u2013{end.strftime('%H:%M')}"
 
     return f"{start.strftime('%H:%M')} until {render_day(end)}, {end.strftime('%H:%M')}"
 
@@ -218,7 +213,8 @@ def build_event(talk: dict, now: dt, past_event: bool = False) -> dict:
         "hashtags": hashtags,
         "location": talk["Luogo"],
         "abstract": truncate_abstract(abstract) if abstract else [],
-        "day": f"{start.day}{suffix(start.day)}",
+        "weekday": start.strftime("%a"),
+        "day": str(start.day),
         "month": start.strftime("%B"),
         "when": render_when(start, end, talk["TuttoIlGiorno"]),
         "live": start < now < end,

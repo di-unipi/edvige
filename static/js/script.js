@@ -139,8 +139,10 @@ function mark_stale() {
 
 mark_stale();
 
-Promise.all(
-  Array.from(document.images)
+// Measure the cards only once images and web fonts are loaded,
+// since both change their height
+Promise.all([
+  ...Array.from(document.images)
     .filter((img) => !img.complete)
     .map(
       (img) =>
@@ -148,7 +150,8 @@ Promise.all(
           img.onload = img.onerror = resolve;
         }),
     ),
-).then(() => {
-  console.log("All images loaded, running the arrangement script.");
+  document.fonts ? document.fonts.ready : Promise.resolve(),
+]).then(() => {
+  console.log("All images and fonts loaded, running the arrangement script.");
   arrange_cards();
 });
