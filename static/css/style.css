@@ -74,3 +74,12 @@ body {
     vertical-align: 0.095em;
     fill: currentcolor;
 }
+
+.stale {
+    color: var(--bs-danger) !important;
+    font-weight: bold;
+}
+
+.stale::before {
+    content: "⚠ Outdated! ";
+}

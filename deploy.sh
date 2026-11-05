@@ -6,8 +6,9 @@ rsync -avz --delete \
 	--exclude "www/" \
 	--exclude "deploy.sh" \
 	--exclude "logs/" \
-	--exclude "www/" \
 	--exclude "uv.lock" \
 	--exclude "data/" \
+	--exclude "tests/" \
+	--exclude "static/assets/locandina.png" \
 	--exclude "pyproject.toml" \
 	./ edvige:edvige/

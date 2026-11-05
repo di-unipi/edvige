@@ -45,7 +45,7 @@ function arrange_cards() {
   let used = [0, 0, 0];
   for (let column_id = 0; column_id < column_count; column_id++) {
     let column = get_column(column_id);
-    for (elem of column.children) {
+    for (const elem of column.children) {
       // Check if class is "special-card"
       if (elem.classList.contains("special-card")) {
         let height = outer_height(elem);
@@ -58,7 +58,7 @@ function arrange_cards() {
   // Iterate over left column childs and remove them
   let cards = [];
   let heights = [];
-  for (elem of left_column.children) {
+  for (const elem of left_column.children) {
     // Check if the element is a special card
     if (elem.classList.contains("special-card")) {
       console.log("Special card found");
@@ -89,6 +89,12 @@ function arrange_cards() {
     console.log("Card height: " + card_height);
     console.log("Used: " + used);
 
+    // Skip cards taller than a whole column, they would never fit
+    if (card_height > max_col_height) {
+      console.log("Skipping card " + i + ", taller than a column");
+      continue;
+    }
+
     // Check if there are free columns
     while (used[current] + card_height > max_col_height) {
       current++;
@@ -101,7 +107,7 @@ function arrange_cards() {
     // Check if the columns are full
     if (full) {
       console.log("Stop inserting after card: " + i);
-      console.log("Remaining cards: " + cards.length - i);
+      console.log("Remaining cards: " + (cards.length - i));
       break;
     }
 
@@ -115,6 +121,23 @@ function arrange_cards() {
     console.log("Used after insert: " + used);
   }
 }
+
+// Highlight the last update when the page has not been rendered recently,
+// e.g. because the download or the rendering keeps failing
+const STALE_AFTER_MS = 15 * 60 * 1000;
+
+function mark_stale() {
+  const last_update = document.getElementById("last-update");
+  if (!last_update) {
+    return;
+  }
+  const updated = Date.parse(last_update.dataset.updated);
+  if (!isNaN(updated) && Date.now() - updated > STALE_AFTER_MS) {
+    last_update.classList.add("stale");
+  }
+}
+
+mark_stale();
 
 Promise.all(
   Array.from(document.images)
