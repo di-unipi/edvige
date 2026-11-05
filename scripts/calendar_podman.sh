@@ -8,9 +8,9 @@
 mkdir -p logs
 mkdir -p www
 podman run --rm \
-  -v "$(pwd)/layout":/edvige/layout:ro,Z \
-  -v "$(pwd)/scripts":/edvige/scripts:ro,Z \
-  -v "$(pwd)/static":/edvige/static:ro,Z \
-  -v "$(pwd)/logs":/edvige/logs:Z \
-  -v "$(pwd)/www":/edvige/www:Z \
+  -v "$(pwd)/layout":/edvige/layout:ro,z \
+  -v "$(pwd)/scripts":/edvige/scripts:ro,z \
+  -v "$(pwd)/static":/edvige/static:ro,z \
+  -v "$(pwd)/logs":/edvige/logs:z \
+  -v "$(pwd)/www":/edvige/www:z \
   edvige
